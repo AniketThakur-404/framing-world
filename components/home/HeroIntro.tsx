@@ -30,10 +30,26 @@ let introPlayed = false
 type Phase = "brand" | "open" | "done"
 
 export function HeroIntro({ ready }: { ready: boolean }) {
-  const [phase, setPhase] = useState<Phase>(() => (introPlayed ? "done" : "brand"))
+  const [phase, setPhase] = useState<Phase>(() =>
+    // Skip on client-side returns, and when landing on a section link like /#bestsellers.
+    introPlayed || (typeof window !== "undefined" && window.location.hash) ? "done" : "brand",
+  )
   const overlayRef = useRef<HTMLDivElement>(null)
   const lineRefs = useRef<(HTMLSpanElement | null)[]>([])
   const brandShownAt = useRef(0)
+  // Only undo what this intro set (other components share <html> styles).
+  const lockedRef = useRef(false)
+  const inertRef = useRef<HTMLElement[]>([])
+
+  const release = () => {
+    const root = document.documentElement
+    if (lockedRef.current) {
+      lockedRef.current = false
+      root.style.overflow = ""
+    }
+    for (const el of inertRef.current) el.inert = false
+    inertRef.current = []
+  }
 
   // Beat 1: lock the page, hide the navbar, decode the wordmark.
   useEffect(() => {
@@ -42,11 +58,30 @@ export function HeroIntro({ ready }: { ready: boolean }) {
     brandShownAt.current = performance.now()
 
     const root = document.documentElement
+    const overlay = overlayRef.current
+    // JS is running: cancel the CSS failsafe that hides the overlay if it never does.
+    if (overlay) overlay.style.animation = "none"
+    // SmoothMotion pauses Lenis while <html> has data-hero-intro; the navbar waits off-screen.
     root.setAttribute("data-hero-intro", "")
-    // SmoothMotion pauses Lenis while <body> has data-scroll-locked.
-    document.body.setAttribute("data-scroll-locked", "")
-    root.style.overflow = "hidden"
+    if (!lockedRef.current) {
+      lockedRef.current = true
+      root.style.overflow = "hidden"
+    }
     window.scrollTo(0, 0)
+
+    // Keep keyboard focus inside the intro: make everything outside it inert.
+    if (overlay && !inertRef.current.length) {
+      for (let node: HTMLElement | null = overlay; node && node !== document.body; node = node.parentElement) {
+        const parent: HTMLElement | null = node.parentElement
+        if (!parent) break
+        for (const sib of Array.from(parent.children)) {
+          if (sib !== node && sib instanceof HTMLElement && !sib.inert) {
+            sib.inert = true
+            inertRef.current.push(sib)
+          }
+        }
+      }
+    }
 
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     let raf = 0
@@ -107,8 +142,9 @@ export function HeroIntro({ ready }: { ready: boolean }) {
     const begin = performance.now()
     const tick = () => {
       const p = Math.min(1, (performance.now() - begin) / OPEN_MS)
-      const W = window.innerWidth
-      const H = window.innerHeight
+      // The overlay's own box (excludes any scrollbar gutter), so the band stays centred.
+      const W = overlay.clientWidth
+      const H = overlay.clientHeight
       overlay.style.clipPath = `path(evenodd, "M0 0H${W}V${H}H0Z ${bandPath(W, H, easeInOutCubic(p))}")`
       if (p < 1) raf = requestAnimationFrame(tick)
       else setPhase("done")
@@ -120,21 +156,20 @@ export function HeroIntro({ ready }: { ready: boolean }) {
   // Beat 3: release the page.
   useEffect(() => {
     if (phase !== "done") return
-    const root = document.documentElement
-    document.body.removeAttribute("data-scroll-locked")
-    root.style.overflow = ""
+    release()
     // Next frame, so the navbar's slide-in transition runs.
-    const raf = requestAnimationFrame(() => root.removeAttribute("data-hero-intro"))
+    const raf = requestAnimationFrame(() => document.documentElement.removeAttribute("data-hero-intro"))
     return () => cancelAnimationFrame(raf)
+     
   }, [phase])
 
   // Never leave the page locked if the hero unmounts mid-intro.
   useEffect(
     () => () => {
-      document.body.removeAttribute("data-scroll-locked")
-      document.documentElement.style.overflow = ""
+      release()
       document.documentElement.removeAttribute("data-hero-intro")
     },
+     
     [],
   )
 
@@ -147,6 +182,9 @@ export function HeroIntro({ ready }: { ready: boolean }) {
       aria-label="Loading Framing World"
       className="hero-intro fixed inset-0 z-[10050] bg-[#ebebea]"
     >
+      <noscript>
+        <style>{".hero-intro{display:none}"}</style>
+      </noscript>
       <IntroLines />
       <div
         className="hero-intro-brand absolute inset-0 flex items-center justify-center"
@@ -163,7 +201,7 @@ export function HeroIntro({ ready }: { ready: boolean }) {
           />
           <div
             aria-hidden
-            className="mb-[1px] flex flex-col font-sans text-[18px] font-normal uppercase leading-[1.12] tracking-[0.02em] text-[#383838] sm:text-[20px]"
+            className="mb-[1px] flex w-[6.4em] flex-col font-sans text-[18px] font-normal uppercase leading-[1.12] tracking-[0.02em] text-[#383838] sm:text-[20px]"
           >
             {WORD_LINES.map((word, i) => (
               <span
@@ -171,7 +209,7 @@ export function HeroIntro({ ready }: { ready: boolean }) {
                 ref={(el) => {
                   lineRefs.current[i] = el
                 }}
-                className="block min-w-[7ch] whitespace-pre"
+                className="block whitespace-pre"
               >
                 {" "}
               </span>

@@ -34,7 +34,12 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
     const section = sectionRef.current
     const canvas = canvasRef.current
     const ctx = canvas?.getContext("2d")
-    if (!section || !canvas || !ctx) return
+    if (!section || !canvas || !ctx) {
+      // Nothing to play: never keep the intro waiting.
+      setFramesReady(true)
+      return
+    }
+    const stage = canvas.parentElement as HTMLElement
 
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches
     const frames: HTMLImageElement[] = new Array(FRAME_COUNT)
@@ -61,7 +66,8 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
 
     const progress = () => {
       const rect = section.getBoundingClientRect()
-      const scrollable = rect.height - window.innerHeight
+      // Measured against the pinned box (it has a min height), not the window.
+      const scrollable = rect.height - stage.offsetHeight
       return scrollable > 0 ? Math.min(1, Math.max(0, -rect.top / scrollable)) : 0
     }
 
@@ -161,17 +167,10 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
     let inside = !finePointer
     let shown = -1
     let raf = 0
-
-    const onMove = (e: PointerEvent) => {
-      tx = e.clientX + 22
-      ty = e.clientY - 6
-      inside = true
-    }
-    const onLeave = () => {
-      inside = !finePointer
-    }
+    if (!finePointer) hint.dataset.touch = ""
 
     const tick = () => {
+      raf = 0
       // Eased follow, so the label drifts after the cursor rather than snapping.
       const k = reduce ? 1 : 0.14
       x += (tx - x) * k
@@ -182,20 +181,39 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
       if (visible !== shown) {
         shown = visible
         hint.style.opacity = String(visible)
+        // No shimmer work while it can't be seen.
+        hint.style.animationPlayState = visible ? "running" : "paused"
       }
       if (finePointer) hint.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) translateY(-50%)`
-      raf = requestAnimationFrame(tick)
+      // Keep going only while there is something to animate; events restart it.
+      const moving = Math.abs(tx - x) > 0.1 || Math.abs(ty - y) > 0.1
+      if (moving || intro) raf = requestAnimationFrame(tick)
     }
-    raf = requestAnimationFrame(tick)
+    const wake = () => {
+      if (!raf) raf = requestAnimationFrame(tick)
+    }
+    const onMove = (e: PointerEvent) => {
+      tx = e.clientX + 22
+      ty = e.clientY - 6
+      inside = true
+      wake()
+    }
+    const onLeave = () => {
+      inside = !finePointer
+      wake()
+    }
+    wake()
 
     if (finePointer) {
       section.addEventListener("pointermove", onMove)
       section.addEventListener("pointerleave", onLeave)
     }
+    window.addEventListener("scroll", wake, { passive: true })
     return () => {
-      cancelAnimationFrame(raf)
+      if (raf) cancelAnimationFrame(raf)
       section.removeEventListener("pointermove", onMove)
       section.removeEventListener("pointerleave", onLeave)
+      window.removeEventListener("scroll", wake)
     }
   }, [])
 
@@ -210,7 +228,7 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
       data-hero-scroll
       className="relative -mt-[var(--header-stack-height)] h-[250svh] w-full bg-black text-white motion-reduce:h-[100svh]"
     >
-      <h2 className="sr-only">{title}</h2>
+      <h1 className="sr-only">{title}</h1>
 
       <div className="sticky top-0 h-[100svh] min-h-[580px] w-full overflow-hidden">
         <canvas ref={canvasRef} aria-hidden className="absolute inset-0 h-full w-full" />
@@ -234,7 +252,7 @@ export function HeroFrameScroll({ banner }: { banner?: HomeHeroBanner }) {
       <div
         ref={hintRef}
         aria-hidden
-        className="hero-scroll-hint pointer-events-none fixed left-0 top-0 z-30 whitespace-nowrap opacity-0 transition-opacity duration-500 [@media(hover:none)]:bottom-8 [@media(hover:none)]:left-1/2 [@media(hover:none)]:top-auto [@media(hover:none)]:-translate-x-1/2"
+        className="hero-scroll-hint pointer-events-none fixed left-0 top-0 z-30 whitespace-nowrap opacity-0 transition-opacity duration-500 data-touch:bottom-8 data-touch:left-1/2 data-touch:top-auto data-touch:-translate-x-1/2"
       >
         Scroll to explore
       </div>

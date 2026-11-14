@@ -33,15 +33,21 @@ export function SmoothMotion() {
       prevent: (node) => Boolean(node.closest?.('[role="dialog"], [data-lenis-prevent], [data-radix-scroll-area-viewport]')),
     })
 
-    // Pause while a dialog or drawer locks the page (Radix sets data-scroll-locked on <body>).
+    // Pause while a dialog or drawer locks the page (Radix sets data-scroll-locked on <body>)
+    // or while the home intro covers it (HeroIntro sets data-hero-intro on <html>).
     const syncLock = () => {
-      if (document.body.hasAttribute("data-scroll-locked")) lenis.stop()
+      const locked =
+        document.body.hasAttribute("data-scroll-locked") ||
+        document.documentElement.hasAttribute("data-hero-intro")
+      if (locked) lenis.stop()
       else lenis.start()
     }
     lenisRef.current = lenis
 
     const lockObserver = new MutationObserver(syncLock)
     lockObserver.observe(document.body, { attributes: true, attributeFilter: ["data-scroll-locked"] })
+    lockObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["data-hero-intro"] })
+    syncLock()
 
     return () => {
       lockObserver.disconnect()

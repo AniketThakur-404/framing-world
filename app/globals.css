@@ -892,6 +892,17 @@ html.lenis body {
 html[data-hero-intro] .navbar-shell {
   translate: 0 calc(-100% - var(--announcement-height));
 }
+/* Match the intro so the scrollbar gutter (hidden while locked) doesn't show as a white strip. */
+html[data-hero-intro] {
+  background-color: #ebebea;
+}
+/* If JavaScript never runs, the intro gets out of the way on its own (HeroIntro cancels this). */
+.hero-intro {
+  animation: hero-intro-failsafe 0s linear 10s forwards;
+}
+@keyframes hero-intro-failsafe {
+  to { visibility: hidden; }
+}
 
 /* Frame mark builds in a few blocky steps, like a pixel reveal. */
 .hero-intro-mark {
@@ -939,5 +950,6 @@ html[data-hero-intro] .navbar-shell {
 
 @media (prefers-reduced-motion: reduce) {
   .hero-intro-mark { animation: none; }
+  .navbar-shell.navbar-shell { transition-duration: 0ms; }
   .hero-scroll-hint { animation: none; color: rgba(255, 255, 255, 0.8); background: none; }
 }
