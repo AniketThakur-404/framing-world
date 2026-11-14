@@ -1,0 +1,100 @@
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+
+import { useContinuousDraggableCarousel } from "@/components/home/useContinuousDraggableCarousel"
+import type { ProductCard } from "@/components/home/TrendingSection"
+
+export function CollectionRecommendations({ products = [] }: { products?: ProductCard[] }) {
+  const displayProducts = products.slice(0, 6)
+  const {
+    viewportRef,
+    trackRef,
+    onPointerEnter,
+    onPointerLeave,
+    onPointerDown,
+    onPointerMove,
+    onPointerUp,
+    onPointerCancel,
+    onClickCapture,
+  } = useContinuousDraggableCarousel({
+    slideCount: displayProducts.length || 1,
+  })
+
+  if (!displayProducts.length) return null
+
+  return (
+    <section
+      aria-labelledby="collection-recommendations-heading"
+      className="w-full overflow-hidden border-t border-black/10 bg-white py-12 text-black sm:py-14"
+    >
+      <div>
+        <div className="flex items-center justify-between gap-6">
+          <h2
+            id="collection-recommendations-heading"
+            className="type-title"
+          >
+            You May Also Like
+          </h2>
+
+          <Link
+            href="/shop"
+            className="group hidden flex-col items-start pb-0.5 text-[13px] md:text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] transition-opacity hover:opacity-70 sm:inline-flex"
+          >
+            <span>View all</span>
+            <span
+              aria-hidden="true"
+              className="mt-[2px] h-px w-full origin-left scale-x-0 bg-black transition-transform duration-200 group-hover:scale-x-100"
+            />
+          </Link>
+        </div>
+
+        <div
+          ref={viewportRef}
+          className="continuous-carousel-viewport mt-7"
+          tabIndex={0}
+          onPointerEnter={onPointerEnter}
+          onPointerLeave={onPointerLeave}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerCancel}
+          onClickCapture={onClickCapture}
+        >
+          <div ref={trackRef} className="continuous-carousel-track">
+            {[...displayProducts, ...displayProducts, ...displayProducts].map((product, index) => (
+              <Link
+                key={`${product.id}-${index}`}
+                href={`/products/${product.slug}`}
+                className="recommendation-card group"
+                aria-label={`View ${product.alt}`}
+                aria-hidden={index >= displayProducts.length}
+                tabIndex={index >= displayProducts.length ? -1 : undefined}
+              >
+                <div className="relative aspect-[330/479] overflow-hidden bg-[#e7e7e4]">
+                  <Image
+                    src={product.image}
+                    alt={product.alt}
+                    fill
+                    sizes="(max-width: 640px) 42vw, (max-width: 1024px) 20vw, 12vw"
+                    className="object-cover"
+                  />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        <div className="mt-7 flex justify-center sm:hidden">
+          <Link
+            href="/shop"
+            className="inline-flex h-10 min-w-[102px] items-center justify-center border border-black px-6 text-[13px] font-normal uppercase leading-none tracking-[0.04em] transition-colors hover:bg-black hover:text-white"
+          >
+            View all
+          </Link>
+        </div>
+      </div>
+    </section>
+  )
+}

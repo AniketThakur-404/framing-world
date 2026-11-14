@@ -1,0 +1,232 @@
+{
+  "name": "Framing World",
+  "legalLine": "© 2026, Framing World. All rights reserved.",
+  "tagline": "India's best custom framing and printing company",
+  "description": "Order custom photo frames online from Delhi leading photo frame shop. Explore wall photo frames, acrylic photo prints & handmade frames. Easy online frame maker with fast delivery.",
+  "metaTitle": "Buy Custom Photo Frames Online | Photo Frame Shop Near me",
+  "url": "https://framingworld.in",
+  "founded": 2005,
+  "founder": "Mr. Kuldeep Sharma",
+  "logo": "/brand/logo.webp",
+  "favicon": "/brand/favicon.png",
+  "ogImage": "/brand/og-image.jpg",
+  "contact": {
+    "phone": "+91 9818040566",
+    "phoneAlt": "+91 9810828566",
+    "whatsapp": "+91 9810828566",
+    "email": "framingworld@gmail.com",
+    "address": "Framing World, D-96, Okhla Industrial Area Phase 1, New Delhi - 110020 (India)",
+    "mapsUrl": "https://maps.google.com?daddr=Framing world",
+    "hours": "Monday - Saturday: 10am - 7pm",
+    "city": "New Delhi",
+    "state": "Delhi",
+    "country": "IN"
+  },
+  "social": {
+    "facebook": "https://www.facebook.com/framingworld.in",
+    "x": "https://x.com/framingworld1",
+    "instagram": "https://www.instagram.com/framingworld",
+    "youtube": "https://www.youtube.com/@Framing-World"
+  },
+  "currency": "INR",
+  "typography": {
+    "heading": {
+      "family": "Playfair Display",
+      "fallback": "serif",
+      "weight": 400,
+      "transform": "uppercase",
+      "lineHeight": 1.2,
+      "sizes": {
+        "h1": "64px / 40px mobile",
+        "h2": "54px / 34px",
+        "h3": "44px / 30px",
+        "h4": "34px / 20px",
+        "h5": "28px / 16px",
+        "h6": "20px / 14px"
+      }
+    },
+    "body": {
+      "family": "Outfit",
+      "fallback": "sans-serif",
+      "size": "17px",
+      "weight": 400,
+      "lineHeight": 1.5
+    },
+    "button": {
+      "family": "Outfit",
+      "size": "13px",
+      "weight": 500,
+      "letterSpacing": "0.2em",
+      "transform": "uppercase",
+      "radius": "0px",
+      "padding": "18px 32px"
+    },
+    "eyebrow": {
+      "size": "12px",
+      "weight": 500,
+      "letterSpacing": "0.2em"
+    },
+    "menu": {
+      "family": "Outfit",
+      "size": "16px",
+      "weight": 500,
+      "transform": "capitalize"
+    }
+  },
+  "colors": {
+    "navy": "#203b59",
+    "terracotta": "#d96b4f",
+    "cta": "#bb5237",
+    "white": "#ffffff",
+    "cream": "#f6f6f0",
+    "creamBorder": "#dfdfca",
+    "border": "#e9e9e9",
+    "inputBorder": "#dee2e6",
+    "muted": "#6c747b",
+    "footerTitle": "#848484",
+    "sale": "#e00b25",
+    "labelNew": "#34bf49",
+    "labelHot": "#d24418",
+    "labelSale": "#ffa800",
+    "error": "#ec523e"
+  },
+  "announcement": {
+    "text": "Premium Handcrafted Frames",
+    "cta": "Shop Now",
+    "href": "/shop"
+  },
+  "navigation": [
+    {
+      "label": "Home",
+      "href": "/"
+    },
+    {
+      "label": "Company",
+      "children": [
+        {
+          "label": "About",
+          "href": "/pages/about-us"
+        },
+        {
+          "label": "Blog",
+          "href": "/blogs/news"
+        }
+      ]
+    },
+    {
+      "label": "Shops",
+      "href": "/shop"
+    },
+    {
+      "label": "Mouldings",
+      "href": "/collections/molding"
+    },
+    {
+      "label": "Printing",
+      "children": [
+        {
+          "label": "Printing Services",
+          "href": "/pages/printing-services"
+        },
+        {
+          "label": "Archival Printing",
+          "href": "/pages/archivalprinting"
+        },
+        {
+          "label": "Diasec Mounting",
+          "href": "/pages/diasec-mounting"
+        },
+        {
+          "label": "Face Mounting",
+          "href": "/pages/face-mounting"
+        }
+      ]
+    },
+    {
+      "label": "Services",
+      "children": [
+        {
+          "label": "Laser cutting service",
+          "href": "/pages/lasercuttingservice"
+        },
+        {
+          "label": "Mount cutting",
+          "href": "/pages/mountcuttingservice"
+        },
+        {
+          "label": "Cnc router",
+          "href": "/pages/cncrouterservice"
+        }
+      ]
+    },
+    {
+      "label": "Products",
+      "href": "/collections/best-selling-frames"
+    },
+    {
+      "label": "Contact",
+      "href": "/contact"
+    }
+  ],
+  "footer": {
+    "about": "Our story began with a passion for crafting frames that combine quality and innovation. Framing World stands as a trusted partner for businesses seeking exceptional framing craftsmanship and reliability.",
+    "columns": [
+      {
+        "title": "Useful",
+        "links": [
+          {
+            "label": "About Us",
+            "href": "/pages/about-us"
+          },
+          {
+            "label": "Blog",
+            "href": "/blogs/news"
+          },
+          {
+            "label": "Contact Us",
+            "href": "/contact"
+          },
+          {
+            "label": "FAQs",
+            "href": "/pages/faqs"
+          }
+        ]
+      },
+      {
+        "title": "Quick links",
+        "links": [
+          {
+            "label": "Printing Service",
+            "href": "/pages/printing-services"
+          },
+          {
+            "label": "Archival Printing",
+            "href": "/pages/archivalprinting"
+          },
+          {
+            "label": "Diasec Mounting",
+            "href": "/pages/diasec-mounting"
+          }
+        ]
+      },
+      {
+        "title": "Information",
+        "links": [
+          {
+            "label": "Mount Cutting",
+            "href": "/pages/mountcuttingservice"
+          },
+          {
+            "label": "Laser Cutting",
+            "href": "/pages/lasercuttingservice"
+          },
+          {
+            "label": "CNC Router",
+            "href": "/pages/cncrouterservice"
+          }
+        ]
+      }
+    ],
+    "newsletterHeading": "Sign up & save 15%"
+  }
+}

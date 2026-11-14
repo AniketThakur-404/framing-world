@@ -1,0 +1,64 @@
+[
+  {
+    "title": "Orders",
+    "intro": "Below are some of are common questions about orders",
+    "items": [
+      {
+        "question": "How do I make a purchase?",
+        "answer": "Shopping with Framing World is simple! Browse our collection, select your favourite photo frame or artwork, choose your preferred size and available customisation options, and click Add to Cart. Proceed to checkout, enter your shipping details, select your preferred payment method, and complete your purchase. Once your order is placed, our team will take care of the rest!"
+      },
+      {
+        "question": "How do I know if my order is confirmed?",
+        "answer": "Once your order has been successfully placed, you will receive an order confirmation notification on your registered email address or mobile number, subject to the contact details provided. Your order will then be processed by our team. If you do not receive a confirmation, please contact us at +91 9818040566 or email us at [framingworld@gmail.com](mailto:framingworld@gmail.com)."
+      },
+      {
+        "question": "Can I change my shipping address after my order is placed?",
+        "answer": "If you need to change your shipping address, please contact our customer support team as soon as possible after placing your order. Address changes may be possible only before your order has been dispatched. Once the order is shipped, we may not be able to modify the delivery address. Please contact us at +91 9818040566 for assistance."
+      }
+    ]
+  },
+  {
+    "title": "Shipping & Returns",
+    "intro": "Below are some common questions about shipping, returns, and exchanges",
+    "items": [
+      {
+        "question": "Do you ship internationally?",
+        "answer": "Currently, Framing World offers shipping across India, ensuring your photo frames and artwork are carefully packed for safe delivery. For international shipping enquiries, please contact our customer support team at +91 9818040566 or email us at [framingworld@gmail.com](mailto:framingworld@gmail.com) to check availability and shipping options for your location."
+      },
+      {
+        "question": "When will my order be shipped?",
+        "answer": "Once your order is successfully placed, our team begins processing it with care. Since many of our products are customised and made to order, processing time may vary depending on the product and its requirements. You will receive an update once your order is ready for dispatch. We take special care to ensure every product is securely packed before shipping."
+      },
+      {
+        "question": "What is your return policy?",
+        "answer": "At Framing World, many of our products are customised according to individual customer requirements. Since these products are made especially for you, we generally do not accept returns or exchanges on customised orders."
+      },
+      {
+        "question": "How long will it take until I receive my order?",
+        "answer": "We aim to deliver your order as quickly and safely as possible. Our product information currently mentions an estimated delivery time of 2–5 days. Actual delivery time may vary depending on your location, product customisation, and courier availability. We also ensure that every frame is securely packed with protective packaging to help prevent damage during transit."
+      }
+    ]
+  },
+  {
+    "title": "Frequently Asked Questions- FAQs",
+    "intro": "Have questions about framing? Here are some FAQs, where you can find clear answers and expert advice to guide your choices.",
+    "items": [
+      {
+        "question": "Are custom-sized frames available?",
+        "answer": "Yes! At Framing World, we offer custom-sized wooden photo frames tailored to your specific requirements. Whether you need a small photo frame or a large statement piece, we can create a frame to suit your space and preferences."
+      },
+      {
+        "question": "Can I submit my own photo?",
+        "answer": "Absolutely! You can upload your favourite photograph while placing your order and choose your preferred frame style. We will help turn your special memories into beautifully framed keepsakes."
+      },
+      {
+        "question": "Are you shipping to all of India?",
+        "answer": "Yes! Framing World delivers across India. We ensure that every order is carefully packed with protective packaging to help keep your photo frames safe during transit."
+      },
+      {
+        "question": "What type of materials are used for framing?",
+        "answer": "At Framing World, we use carefully selected quality materials to ensure durability and an elegant finish. Our framing materials include premium wooden frames, high-quality mount boards, and acrylic glazing options, providing a beautiful and lasting presentation for your photographs and artwork."
+      }
+    ]
+  }
+]

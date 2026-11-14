@@ -1,0 +1,288 @@
+{
+  "sourceUrl": "https://framingworld.in/",
+  "hero": [
+    {
+      "eyebrow": "Framing world",
+      "title": "India's best custom framing and printing company",
+      "text": "Framing World, a premium destination for custom framing and archival printing, combines craftsmanship with museum-grade materials to preserve your art with perfection.",
+      "cta": "Shop Now",
+      "href": "/collections/fine-art-prints",
+      "desktop": "/images/home/hero-1.jpg",
+      "mobile": "/images/home/mobile/hero-1.jpg"
+    },
+    {
+      "eyebrow": "Crafting Excellence in Art Framing",
+      "title": "Museum Quality Framing",
+      "text": "Framing World – India’s premium destination for custom framing, archival printing, and museum-grade preservation solutions.",
+      "cta": "Shop Now",
+      "href": "/collections/fine-art-prints",
+      "desktop": "/images/home/hero-2.webp",
+      "mobile": "/images/home/mobile/hero-2.webp"
+    },
+    {
+      "eyebrow": "Framing World: Where Art Meets Precision and Preservation",
+      "title": "Hang the world on your walls",
+      "text": "Framing Memories, Elevating Art.",
+      "cta": "Shop Now",
+      "href": "/collections/fine-art-prints",
+      "desktop": "/images/home/hero-3.webp",
+      "mobile": "/images/home/mobile/hero-3.jpg"
+    }
+  ],
+  "marquee": [
+    "Artwork Framing",
+    "Wall Frame Gallery",
+    "Custom Framing",
+    "Archival Printing"
+  ],
+  "intro": {
+    "title": "Premium Imported Wooden Frames",
+    "text": "Timeless elegance and unmatched craftsmanship to elevate your art and décor.",
+    "cta": "Shop Now",
+    "href": "/shop"
+  },
+  "about": {
+    "eyebrow": "India's best custom framing company",
+    "title": "Framing World",
+    "text": "At Framing world we make best quality wooden frame for your art work, we like to think we are the best in the business. It’s a big claim but with over many years combined experience in the framing industry, we know a thing or two about framing. We put that knowledge and experience into practice every day allowing you to create some of the most amazing works of art that you will cherish for a lifetime.",
+    "cta": "Discover Now",
+    "href": "/shop",
+    "youtubeId": "uq_pwpYpP6s",
+    "images": [
+      {
+        "src": "/images/home/about-1.jpg",
+        "alt": "High quality framing service in Delhi"
+      },
+      {
+        "src": "/images/home/about-2.jpg",
+        "alt": "Best framing company for online orders"
+      }
+    ]
+  },
+  "productRows": [
+    {
+      "eyebrow": "Archival Prints",
+      "title": "Fine Art Prints",
+      "collection": "fine-art-prints",
+      "products": [
+        "metal-frame",
+        "strip",
+        "canvas-printing",
+        "mini-prints"
+      ]
+    },
+    {
+      "eyebrow": "High Quality Prints On Flat Surface",
+      "title": "UV Prints",
+      "collection": "uv-prints",
+      "products": [
+        "arcylic-prints-copy",
+        "table-top-frame",
+        "mini-print",
+        "glass-printig"
+      ]
+    },
+    {
+      "eyebrow": "Imported Wooden Frame, Custom Photo Frames & Picture Frame Designs",
+      "title": "Wall Photo Frames for Every Space",
+      "collection": "wall-gallery",
+      "products": [
+        "classic-cinema-gallery",
+        "driven-moments",
+        "generations-of-love",
+        "art-of-strength"
+      ]
+    },
+    {
+      "eyebrow": "Premium choice",
+      "title": "Digital Fine Art",
+      "collection": "best-selling-frames",
+      "products": [
+        "majnu-bhai",
+        "canal-heritage",
+        "andalusian-grace",
+        "slow-luxe",
+        "shadow-elegance",
+        "orbit-of-imagination",
+        "jardin-elegant",
+        "radiant-soul"
+      ]
+    },
+    {
+      "eyebrow": "Acrylic Photo Prints & Framed Artwork",
+      "title": "Custom Artwork Frames",
+      "collection": "imported-wooden-frames",
+      "products": [
+        "102-brown-wooden-frame",
+        "105-brown-wooden-frame",
+        "152-black-wooden-frame",
+        "153-boat",
+        "202-black-wooden-frame",
+        "208-black-wooden-frame",
+        "304-brown-wooden-frame",
+        "black-frame-with-golden-line",
+        "classic-black-wooden-frame",
+        "105-white-frame"
+      ]
+    },
+    {
+      "eyebrow": "Art Materials",
+      "title": "Art Store",
+      "collection": "art-store",
+      "products": [
+        "wooden-stretcher"
+      ]
+    }
+  ],
+  "collectionTiles": {
+    "eyebrow": "Collection Online Photo Frame Order Made Easy",
+    "title": "Explore the collections",
+    "tiles": [
+      {
+        "eyebrow": "Mount Frame",
+        "title": "Gallery",
+        "href": "/collections/wall-gallery",
+        "image": "/images/home/tile-mount-frame-gallery.jpg",
+        "alt": "Online artwork framing service"
+      },
+      {
+        "eyebrow": "Frame Wall",
+        "title": "Gallery",
+        "href": "/collections/imported-wooden-frames",
+        "image": "/images/home/tile-frame-wall-gallery.jpg",
+        "alt": "Custom framing service in Delhi"
+      },
+      {
+        "eyebrow": "Best Selling",
+        "title": "Frames",
+        "href": "/collections/best-selling-frames",
+        "image": "/images/home/tile-best-selling-frames.jpg",
+        "alt": "Framing gallery in Delhi"
+      }
+    ]
+  },
+  "consultation": {
+    "eyebrow": "Home consultation",
+    "title": "Bring the Art Gallery Experience to Your Home",
+    "paragraphs": [
+      "At Framing World, we know that choosing the perfect frame or print is all about how it fits into your space. That’s why we offer exclusive Home Consultation Services—so you can make the right choices in the comfort of your own home.",
+      "Our Framing & Printing Specialists will visit you, understand your décor style, and help you select the ideal frame designs, matting, glass, or printing options. We’ll guide you through sizes, materials, and finishes, ensuring every piece complements your interiors beautifully.",
+      "From artwork and photographs to custom prints, we’ll finalize everything on the spot—saving you time, removing guesswork, and making the entire process effortless.",
+      "Book Your Home Consultation Today and let us turn your vision into reality—right where it belongs."
+    ],
+    "cta": "Book Now",
+    "href": "/contact",
+    "image": "/images/home/home-consultation.jpg",
+    "alt": "Custom photo frame in Delhi",
+    "charges": {
+      "title": "Frame Consultancy Charges",
+      "subtitle": "A professional service to help you place photo frames at home",
+      "text": "This service is specially designed for those who want to install photo frames, paintings, or wall décor at home. Our expert team will visit your place and help with frame placement, size selection, design matching, and wall alignment.",
+      "price": 999,
+      "cta": "Book & Pay 999/-",
+      "product": "frame-consultancy-service"
+    }
+  },
+  "founder": {
+    "eyebrow": "Founder Of Framing World",
+    "title": "Mr. Kuldeep Sharma",
+    "paragraphs": [
+      "Kuldeep Sharma, the visionary behind Framing World, was born in 1976 and brings over three decades of hands-on experience in the art and framing industry. With a deep-rooted passion for craftsmanship and an uncompromising eye for quality, he founded Framing World in 2005 with the mission to deliver the finest custom framing and archival printing solutions in India and beyond.",
+      "Driven by a commitment to excellence, Mr. Sharma has transformed Framing World into a trusted name among artists, collectors, galleries, and museums. His focus on using only the most premium materials and the latest techniques ensures that every frame not only protects but also elevates the value of the artwork it surrounds.",
+      "Under his leadership, Framing World continues to set industry standards, offering world-class framing services from its New Delhi studio to clients across the globe."
+    ],
+    "cta": "Know About Company",
+    "href": "/pages/about-us",
+    "image": "/images/home/founder.jpg",
+    "alt": "Mr. Kuldeep Sharma, founder of Framing World"
+  },
+  "benefits": [
+    {
+      "title": "Free shipping",
+      "text": "Free Shipping on In-Store Purchases. Shipping charges apply to online orders."
+    },
+    {
+      "title": "Customer support",
+      "text": "Need assistance? We're happy to help! For any questions feel free to contact our team at +91 9818040566."
+    },
+    {
+      "title": "Refer a friend",
+      "text": "Refer a friend and get 15% off each other."
+    },
+    {
+      "title": "Secure payment",
+      "text": "Your payment details are protected with secure payment processing for a safe and smooth checkout experience."
+    }
+  ],
+  "newsletter": {
+    "title": "Sign up to the newsletter.",
+    "text": "Subscribe to get notified about new stories, news and personal offers.",
+    "button": "Subscribe"
+  },
+  "seo": {
+    "h1": "Custom Frames Company in Delhi - Brand Framing World",
+    "blocks": [
+      {
+        "type": "heading",
+        "level": 3,
+        "text": "Transform Your Space with Custom Frames"
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Custom Online PhotoFrames Shop in Delhi"
+      },
+      {
+        "type": "paragraph",
+        "text": "Looking for the ideal way to preserve your memories? [Framing World](/) specializes in custom photo frames online, making it easy to design and order frames that suit your taste. Our [photo frame shop](/) is your all-in-one destination. It combines artistry, contemporary design, and affordability for wall photo frames, acrylic photo prints, and handmade photo frames. We make it simple to [buy photo frames online](/shop) with hassle-free ordering and fast doorstep delivery. Order now and turn your photos into timeless keepsakes."
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "PhotoFrame Shop – Buy Online"
+      },
+      {
+        "type": "paragraph",
+        "text": "The process of choosing the perfect frame should be as special as the memory it holds. Through our online frame maker, you can make a photo online frame with just a few clicks, browse one of our curated gallery photo frames, or browse our collections of exclusive framed artwork. All products are designed with precision and crafted from high-quality materials to ensure long-lasting durability. Also, our technologically superior services, printing, [archival printing](/pages/archivalprinting), [laser cutting](/pages/lasercuttingservice), [mount cutting](/pages/mountcuttingservice) and [CNC router](/pages/cncrouterservice), make us the best bet among the individual, business as well as gallery users in India."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Wide range of photo frame designs for every décor",
+          "Easy online photo frame order process with fast delivery",
+          "Expert framing services backed by 15+ years of experience",
+          "[Best-selling frames](/collections/best-selling-frames) curated for your space"
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Transform Your Space withCustom Frames"
+      },
+      {
+        "type": "paragraph",
+        "text": "A great frame is not just a piece of decoration it’s a statement. Our range of photo frames, including smooth acrylic photo prints in the homes of the modern era and bespoke photo frames that lend a touch of antiquity, will help you create a gallery wall you’ll be proud of. Whether it’s a family portrait, a certificate, or even a large artwork Our team provides museum-quality framing for every artwork, ensuring longevity and precision, following best practices recommended by experts at the Smithsonian’s Art of Framing. [Browse our collection](/shop) of shops or read more about us so that you can understand why customers will rely on us to be the best [online photo frame shop](/shop) in India."
+      },
+      {
+        "type": "list",
+        "items": [
+          "Start designing today [buy your photo frames online](/) and turn your memories into timeless art."
+        ]
+      },
+      {
+        "type": "heading",
+        "level": 2,
+        "text": "Frame Gallery & Online Frame Maker in Delhi"
+      },
+      {
+        "type": "paragraph",
+        "text": "Build your dream frame gallery with our curated gallery photo frames and easy-to-use online frame maker. You can add frames to photos online, preview designs, and order in just a few clicks. With support for bulk orders, corporate clients, and exhibitions, we’re the go-to framing partner for Delhi NCR. Explore our [best-selling frames](/collections/best-selling-frames) or [contact us](/contact) today to get started."
+      },
+      {
+        "type": "paragraph",
+        "text": "Looking for custom photo frames online? At Framing World, we help you preserve your memories with premium wall photo frames, picture frame designs, acrylic photo prints, and handcrafted frames made with care. Whether you want to buy photo frames online, add frame to photo online, or explore our frame gallery, we offer an easy online photo frame order experience with fast delivery across India. From modern framed artwork to classic handmade photo frames, every product is crafted for quality and durability. Our online frame maker allows you to personalize your photos in just a few clicks. Choose from multiple photo frame designs, materials, and sizes to match your home or office décor. If you’re searching for a reliable picture frame shop, Framing World brings gallery-quality framing directly to your doorstep. Explore wall photo frames, acrylic prints, and custom frames today and turn your favorite moments into timeless art."
+      }
+    ],
+    "closing": "Brand Framing World offers professional online photo framing service with nationwide delivery. We are a custom frames company in Delhi, known for our high quality framing service. If you're looking for artwork framing company or custom framing service in Delhi, we've got you covered. Order photo frames online in Delhi with ease from the best framing company for online orders. Explore picture framing services near me and place order for picture frames online through our Shopify store."
+  }
+}

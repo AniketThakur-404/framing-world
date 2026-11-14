@@ -1,0 +1,270 @@
+"use client"
+
+import Image from "next/image"
+import Link from "next/link"
+import { Check, Minus, Plus, X } from "lucide-react"
+
+import { CartOfferProgress } from "@/components/cart/CartOfferProgress"
+import { trendingProducts } from "@/components/product/productData"
+import { CartRecommendationsCarousel } from "@/components/cart/CartRecommendationsCarousel"
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet"
+import { useCart, type CartItem } from "@/lib/cart-context"
+import { usePageContent } from "@/lib/site-content-context"
+
+
+const recommendations = [
+  {
+    id: trendingProducts[0]?.id || "recommendation-1",
+    slug: trendingProducts[0]?.slug || "product-1",
+    image: trendingProducts[0]?.image || "/images/home/tile-best-selling-frames.jpg",
+    alt: trendingProducts[0]?.alt || "Framed artwork",
+  },
+  {
+    id: trendingProducts[1]?.id || "recommendation-2",
+    slug: trendingProducts[1]?.slug || "product-2",
+    image: trendingProducts[1]?.image || "/images/home/tile-frame-wall-gallery.jpg",
+    alt: trendingProducts[1]?.alt || "Gallery wall",
+  },
+  {
+    id: trendingProducts[2]?.id || "recommendation-3",
+    slug: trendingProducts[2]?.slug || "product-3",
+    image: trendingProducts[2]?.image || "/images/home/tile-mount-frame-gallery.jpg",
+    alt: trendingProducts[2]?.alt || "Mount frame",
+  },
+]
+
+function CartItemRow({ item }: { item: CartItem }) {
+  const { removeFromCart, updateQuantity } = useCart()
+  
+  return (
+    <article className="grid grid-cols-[104px_minmax(0,1fr)] gap-5 border-b border-white/10 pb-6 last:border-b-0 last:pb-0">
+      <Link
+        href={item.slug ? `/products/${item.slug}` : "#"}
+        className="relative aspect-[3/4] overflow-hidden bg-[#1a1a1a]"
+      >
+        <Image
+          src={item.image}
+          alt={item.alt || item.title || "Cart product"}
+          fill
+          sizes="104px"
+          className="object-cover object-center"
+        />
+      </Link>
+
+      <div className="flex min-w-0 flex-col justify-between py-0.5">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <Link
+              href={item.slug ? `/products/${item.slug}` : "#"}
+              className="line-clamp-2 block text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white/95 hover:opacity-80 transition-opacity"
+            >
+              {item.title || "NAME OF THE PRODUCT"}
+            </Link>
+
+            <div className="mt-1.5 flex items-center gap-3 text-[13px] uppercase leading-[1.4] tracking-[0.04em] text-white/60">
+              <span>SIZE: <span className="text-white">{item.size}</span></span>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => removeFromCart(item.id, item.size)}
+            aria-label={`Remove ${item.title}`}
+            className="shrink-0 p-1 text-white/60 transition-colors hover:text-white cursor-pointer"
+          >
+            <X aria-hidden="true" className="size-4 stroke-[1.8]" />
+          </button>
+        </div>
+
+        <div className="mt-3 flex items-center justify-between">
+          <div className="flex items-center border border-white/20 bg-white/5">
+            <button
+              type="button"
+              onClick={() => updateQuantity(item.id, item.size, item.quantity - 1)}
+              aria-label="Decrease quantity"
+              className="flex size-8 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+            >
+              <Minus className="size-3" />
+            </button>
+            <span className="w-8 text-center text-[13px] font-normal text-white">{item.quantity}</span>
+            <button
+              type="button"
+              onClick={() => updateQuantity(item.id, item.size, item.quantity + 1)}
+              aria-label="Increase quantity"
+              className="flex size-8 items-center justify-center text-white/80 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+            >
+              <Plus className="size-3" />
+            </button>
+          </div>
+
+          <p className="text-[14px] font-normal uppercase tracking-[0.04em] text-white/95">
+            {item.price || "₹0"}
+          </p>
+        </div>
+      </div>
+    </article>
+  )
+}
+
+function PromoMarqueeRow({ text: promoStripText }: { text: string }) {
+  return (
+    <div className="flex shrink-0 items-center gap-10 whitespace-nowrap pr-10 text-[12px] font-normal uppercase leading-[1.4] tracking-[0.04em]">
+      {Array.from({ length: 4 }).map((_, index) => (
+        <span key={`promo-${index}`} className="whitespace-nowrap">
+          {promoStripText}
+        </span>
+      ))}
+    </div>
+  )
+}
+
+type CartSidebarProps = {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
+
+export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
+  const page = usePageContent("cartPage")
+  const { cart, totalItems } = useCart()
+
+  const subtotal = cart.reduce((acc, item) => {
+    const raw = (item.price || "0").replace(/[^\d.]/g, "")
+    const num = parseFloat(raw) || 0
+    return acc + num * (item.quantity || 1)
+  }, 0)
+  const subtotalFormatted = `₹${subtotal.toLocaleString("en-IN")}`
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent
+        side="right"
+        showCloseButton={false}
+        overlayClassName="!z-[10000] bg-black/50 backdrop-blur-[1px]"
+        className="!z-[10001] !fixed !inset-y-0 !top-0 !bottom-0 !right-0 !h-screen !h-[100dvh] !max-h-screen !gap-0 !p-0 overflow-hidden border-l border-white/10 bg-black text-white shadow-[0_0_80px_rgba(0,0,0,0.45)] ease-in-out duration-300"
+        style={{ width: "min(100vw, max(480px, 32vw))", maxWidth: "none", height: "100dvh", top: 0, bottom: 0, right: 0 }}
+      >
+        <div className="flex h-full min-h-0 flex-col overflow-hidden" style={{ height: "100%" }}>
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
+            <div className="flex items-center gap-2 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white">
+              {totalItems > 0 ? (
+                <>
+                  <Check className="size-4 stroke-[2.4]" />
+                  <span>{totalItems} ITEM{totalItems !== 1 && "S"} ADDED</span>
+                </>
+              ) : (
+                <span>SHOPPING BAG (0)</span>
+              )}
+            </div>
+
+            <SheetClose asChild>
+              <button
+                type="button"
+                className="inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 transition-opacity hover:opacity-100"
+              >
+                <span>CLOSE</span>
+                <X aria-hidden="true" className="size-4 stroke-2" />
+              </button>
+            </SheetClose>
+          </div>
+
+          <SheetTitle className="sr-only">Cart</SheetTitle>
+          <SheetDescription className="sr-only">
+            Your cart items, offers, recommendations, and checkout actions.
+          </SheetDescription>
+
+          {/* Scrollable Container with Offer, Cart Items, Marquee & Recommendations */}
+          <div className="cart-item-scrollbar min-h-0 flex-1 overflow-y-auto">
+            {/* Cart Offer Progress */}
+            {page.show("offerProgress") ? (
+              <div className="border-b border-white/10 px-6 py-5">
+                <CartOfferProgress />
+              </div>
+            ) : null}
+
+            {/* Cart Items List */}
+            <div className="px-6 py-6">
+              {cart.length > 0 ? (
+                <section className="space-y-6">
+                  {cart.map((item) => (
+                    <CartItemRow key={`scroll-${item.id}-${item.size}`} item={item} />
+                  ))}
+                </section>
+              ) : (
+                <div className="py-12 text-center">
+                  <p className="text-[14px] uppercase tracking-[0.04em] text-white/60">
+                    {page.text("sidebar", "empty")}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => onOpenChange(false)}
+                    className="mt-5 inline-flex h-11 items-center border border-white px-6 text-[14px] uppercase tracking-[0.04em] text-white transition-colors hover:bg-white hover:text-black cursor-pointer"
+                  >
+                    Continue Shopping
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Promo Marquee Strip */}
+            {page.show("marquee") ? (
+              <div className="overflow-hidden bg-white py-2 text-black">
+                <div className="flex w-max transform-gpu items-center animate-[marquee_30s_linear_infinite] motion-reduce:animate-none [will-change:transform]">
+                  <PromoMarqueeRow text={page.text("marquee", "text")} />
+                  <PromoMarqueeRow text={page.text("marquee", "text")} />
+                </div>
+              </div>
+            ) : null}
+
+            {/* Recommendations (You May Also Like) in scroll body */}
+            {page.show("sideRecommendations") ? (
+              <div className="border-t border-white/10 px-6 py-6">
+                <CartRecommendationsCarousel items={recommendations} />
+              </div>
+            ) : null}
+          </div>
+
+          {/* Fixed Bottom Checkout Footer */}
+          <div className="flex-none mt-auto border-t border-white/10 bg-black px-6 pb-[max(20px,env(safe-area-inset-bottom))] pt-5">
+            <div className="mb-4 flex items-center justify-between text-[13px] uppercase tracking-[0.04em]">
+              <span className="text-white/70">Subtotal</span>
+              <span className="text-[14px] font-normal tracking-[0.04em] text-white">{subtotalFormatted}</span>
+            </div>
+
+            {totalItems > 0 ? (
+              <Link
+                href="/checkout"
+                onClick={() => onOpenChange(false)}
+                className="flex h-12 w-full items-center justify-center bg-white text-[14px] font-normal uppercase tracking-[0.04em] text-black transition-opacity hover:opacity-90"
+              >
+                {page.text("sidebar", "checkout")}
+              </Link>
+            ) : (
+              <button
+                type="button"
+                disabled
+                className="flex h-12 w-full items-center justify-center border border-white/10 bg-white/10 text-[14px] font-normal uppercase tracking-[0.04em] text-white/40 cursor-not-allowed"
+              >
+                {page.text("sidebar", "checkout")}
+              </button>
+            )}
+
+            <Link
+              href="/cart"
+              onClick={() => onOpenChange(false)}
+              className="mt-3.5 block text-center text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 underline underline-offset-4 transition-opacity hover:text-white"
+            >
+              {page.text("sidebar", "viewCart")}
+            </Link>
+          </div>
+        </div>
+      </SheetContent>
+    </Sheet>
+  )
+}

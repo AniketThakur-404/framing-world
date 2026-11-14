@@ -1,0 +1,126 @@
+import Image from "next/image"
+import Link from "next/link"
+
+import { bannerFocusProps, isVideoMedia } from "@/lib/banner-media"
+import type { HomeBannerSectionItem } from "@/lib/store/banners"
+import { cn } from "@/lib/utils"
+
+function BannerMedia({
+  src,
+  alt,
+  className,
+  sizes = "100vw",
+  focus = {},
+}: {
+  src: string
+  alt: string
+  className?: string
+  /** The phone/desktop variants are each hidden at the other size. */
+  sizes?: string
+  /** Crop focus chosen in the admin. */
+  focus?: ReturnType<typeof bannerFocusProps>
+}) {
+  if (isVideoMedia(src)) {
+    return (
+      <video
+        src={src}
+        autoPlay
+        muted
+        loop
+        playsInline
+        preload="auto"
+        aria-label={alt}
+        className={cn("absolute inset-0 h-full w-full object-cover object-center", className, focus.className)}
+        style={focus.style}
+      />
+    )
+  }
+
+  return (
+    <Image
+      src={src}
+      alt={alt}
+      fill
+      sizes={sizes}
+      className={cn("object-cover object-center", className, focus.className)}
+      style={focus.style}
+    />
+  )
+}
+
+/**
+ * Full-width homepage banner. The whole banner is one link to `ctaLink`;
+ * the optional button sits on top and goes to the same place.
+ */
+export function FullWidthBanner({
+  banner,
+  fallbackSrc,
+  defaultAlt,
+  className,
+}: {
+  banner: HomeBannerSectionItem
+  fallbackSrc: string
+  defaultAlt: string
+  className?: string
+}) {
+  const desktopSrc = banner.desktopImageUrl || fallbackSrc
+  const alt = banner.title || defaultAlt
+  const link = banner.ctaLink?.trim()
+  const focus = bannerFocusProps(banner.desktopFocus, banner.mobileFocus)
+
+  const content = (
+    <section data-unfold className={cn("hover-zoom group/banner relative w-full overflow-hidden bg-black", className)}>
+      {banner.mobileImageUrl ? (
+        <>
+          <div className="absolute inset-0 sm:hidden">
+            <BannerMedia src={banner.mobileImageUrl} alt={alt} sizes="(max-width: 639px) 100vw, 1px" focus={focus} />
+          </div>
+          <div className="absolute inset-0 hidden sm:block">
+            <BannerMedia src={desktopSrc} alt={alt} sizes="(min-width: 640px) 100vw, 1px" focus={focus} />
+          </div>
+        </>
+      ) : (
+        <BannerMedia src={desktopSrc} alt={alt} focus={focus} />
+      )}
+
+      {banner.overlayOpacity ? (
+        <div
+          className="pointer-events-none absolute inset-0 bg-black"
+          style={{ opacity: banner.overlayOpacity / 100 }}
+        />
+      ) : null}
+
+      {banner.title || banner.subtitle || banner.ctaText ? (
+        <div className="pointer-events-none absolute inset-0 z-10 flex flex-col items-center justify-center p-3 text-center sm:p-6">
+          {banner.title ? (
+            <h3 className="font-heading text-[20px] font-normal uppercase leading-[1.15] tracking-normal text-white drop-shadow-md sm:text-[30px] lg:text-[44px]">
+              {banner.title}
+            </h3>
+          ) : null}
+          {banner.subtitle ? (
+            <p className="mt-1.5 max-w-[56ch] text-[12px] font-normal leading-[1.45] tracking-normal text-white/90 sm:mt-2 sm:text-[14px] md:text-[16px]">
+              {banner.subtitle}
+            </p>
+          ) : null}
+          {banner.ctaText ? (
+            <span className="mt-3 inline-flex h-9 items-center justify-center border border-brand-cta bg-brand-cta px-5 text-[11px] font-medium uppercase leading-none tracking-[0.2em] text-white shadow-sm transition group-hover/banner:border-brand-terracotta group-hover/banner:bg-brand-terracotta sm:mt-5 sm:h-11 sm:px-7 sm:text-[13px]">
+              {banner.ctaText}
+            </span>
+          ) : null}
+        </div>
+      ) : null}
+    </section>
+  )
+
+  if (!link) return content
+
+  return (
+    <Link
+      href={link}
+      aria-label={banner.ctaText ? `${banner.ctaText}${banner.title ? ` – ${banner.title}` : ""}` : alt}
+      className="block cursor-pointer"
+    >
+      {content}
+    </Link>
+  )
+}
