@@ -1,13 +1,10 @@
-import { PictureRailGallery, type PictureRailItem } from "@/components/ui/picture-rail-gallery"
+import { CollectionRail } from "@/components/collection/CollectionRail"
 import { ProductListing } from "@/components/collection/ProductListing"
 import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
 import { parseSort, sortProducts } from "@/components/collection/productSort"
 import { resolvePage } from "@/lib/page-content"
 import { getSiteContent } from "@/lib/store/site"
-import {
-  listPublishedCollectionsWithImages,
-  listPublishedProducts,
-} from "@/lib/store/catalog"
+import { listPublishedCollectionsWithImages, listPublishedProducts } from "@/lib/store/catalog"
 
 const FALLBACK_HERO = "/images/home/hero-2.webp"
 export async function CollectionsHub({ sort: sortParam }: { sort?: string | string[] }) {
@@ -17,31 +14,12 @@ export async function CollectionsHub({ sort: sortParam }: { sort?: string | stri
   const page = resolvePage("collectionsPage", siteContent.collectionsPage)
   const hero = collections.find((collection) => collection.image)
   const heroImage = page.text("hero", "src") || hero?.image || FALLBACK_HERO
-  const galleryItems: PictureRailItem[] = siteContent.navigation.edits.filter((link) => link.href.startsWith("/collections/")).map((link, index) => {
-    const collection = collections.find((entry) => `/collections/${entry.slug}` === link.href)
-    return {
-    id: link.href,
-    title: link.label,
-    href: link.href,
-    image: collection?.image || heroImage,
-    frame: (["oak", "black", "white"] as const)[index % 3],
-    mat: true,
-    aspect: index % 2 === 0 ? 0.8 : 1,
-    drop: index % 2 === 0 ? 0 : 0.12,
-    }
-  })
 
   return (
     <div className="w-full bg-white text-black">
 
       {page.show("hero") ? (
-        <PictureRailGallery
-          items={galleryItems.length ? galleryItems : [{ id: "studio", title: "Framing World", image: heroImage, frame: "oak", mat: true }]}
-          eyebrow="The Framing World collections"
-          heading="A little inspiration for your walls"
-          showCaption={false}
-          className="py-8 sm:py-14 [&_header_h2]:font-heading [&_header_h2]:font-normal [&_header_h2]:sm:text-4xl"
-        />
+        <CollectionRail fallbackImage={heroImage} />
       ) : null}
 
       <ProductListing

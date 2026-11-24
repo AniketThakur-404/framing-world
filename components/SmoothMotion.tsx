@@ -17,10 +17,12 @@ import { usePathname } from "next/navigation"
  */
 export function SmoothMotion() {
   const pathname = usePathname()
+  const isDashboard = pathname === "/dashboard" || pathname.startsWith("/dashboard/")
   const lenisRef = useRef<Lenis | null>(null)
 
-  // Smooth scrolling, created once for the whole visit.
+  // Keep admin forms and nested lists on native browser scrolling.
   useEffect(() => {
+    if (isDashboard) return
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
     const lenis = new Lenis({
@@ -54,7 +56,7 @@ export function SmoothMotion() {
       lenis.destroy()
       lenisRef.current = null
     }
-  }, [])
+  }, [isDashboard])
 
   // New page: start at the top. Lenis keeps its own scroll target, so without
   // this it drags the page back to the previous position after navigation.

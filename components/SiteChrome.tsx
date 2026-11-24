@@ -8,8 +8,8 @@ import { cn } from "@/lib/utils"
 
 export function SiteChrome({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  void pathname
-  const isMinimalChrome = false
+  // The admin dashboard has its own sidebar, so it gets no store header or footer.
+  const isMinimalChrome = pathname === "/dashboard" || pathname.startsWith("/dashboard/")
 
   return (
     <>

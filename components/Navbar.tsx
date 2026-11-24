@@ -377,8 +377,9 @@ export function Navbar({
   const isOverlay = pathname === "/"
   const { wishlist, isLoaded, setIsSidebarOpen } = useWishlist()
   const { isCartOpen, setIsCartOpen, totalItems } = useCart()
-  // No customer accounts: the person icon opens the contact page.
-  const accountHref = "/contact"
+  // The person icon opens the login page; signed-in visitors are sent on to
+  // their account (or the dashboard for staff) from there.
+  const accountHref = "/login"
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -661,8 +662,8 @@ export function Navbar({
 
             <Link
               href={accountHref}
-              aria-label="Contact us"
-              title="Contact us"
+              aria-label="Account"
+              title="Login / Sign up"
               className="inline-flex size-9 cursor-pointer items-center justify-center text-current transition-[color,opacity] duration-300 ease-out hover:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-current/30"
             >
               <UserRound className="size-[18px] stroke-[1.7]" />
@@ -1074,7 +1075,7 @@ export function Navbar({
                   className="flex items-center gap-3 py-2 transition-colors hover:text-white"
                 >
                   <UserRound className="size-4 stroke-[1.8]" />
-                  <span>Contact us</span>
+                  <span>Login / Sign up</span>
                 </Link>
 
                 <button

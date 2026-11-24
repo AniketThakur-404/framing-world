@@ -10,7 +10,7 @@ export function MotionBannerSection({
 
   return (
     <FullWidthBanner
-      banner={banner}
+      banner={{ ...banner, overlayOpacity: 0 }}
       fallbackSrc="/images/home/hero-2.webp"
       defaultAlt="Framed prints above a sofa"
       className="aspect-[4/3] sm:aspect-[2/1]"

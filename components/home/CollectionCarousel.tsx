@@ -55,16 +55,18 @@ function TileCard({ tile, hidden }: { tile: CategoryTile; hidden: boolean }) {
       aria-label={`Shop ${tile.label}`}
       tabIndex={hidden ? -1 : undefined}
       draggable={false}
-      // 2.5 tiles across on desktop (the third is cut in half),
-      // and as tall as the screen below the header so the strip fits in view.
-      className="group relative block h-[min(60svh,500px)] w-[62vw] shrink-0 overflow-hidden bg-[#efefef] sm:h-[clamp(420px,calc(100svh-var(--main-navbar-height)),834px)] sm:w-[55vw] lg:w-[40vw]"
+      // About 3.5 tiles across on desktop, in a compact strip well under a screen tall.
+      className="group relative block h-[min(48svh,400px)] w-[56vw] shrink-0 overflow-hidden bg-[#efefef] sm:h-[clamp(340px,60svh,560px)] sm:w-[42vw] lg:w-[28vw]"
     >
       <Image
         src={tile.image}
         alt={tile.alt}
         fill
         draggable={false}
-        sizes="(max-width: 639px) 62vw, (max-width: 1023px) 55vw, 40vw"
+        // Landscape photos are cropped to cover a portrait tile, so they render
+        // about twice the tile's height wide; ask for that, not the tile width.
+        sizes="(max-width: 639px) 100vw, 1200px"
+        quality={90}
         className={cn("pointer-events-none object-cover object-center", focus.className)}
         style={focus.style}
       />

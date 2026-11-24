@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { Check, Minus, Plus, X } from "lucide-react"
+import { Minus, Plus, X } from "lucide-react"
 
 import { CartOfferProgress } from "@/components/cart/CartOfferProgress"
 import { trendingProducts } from "@/components/product/productData"
@@ -153,22 +153,16 @@ export function CartSidebar({ open, onOpenChange }: CartSidebarProps) {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-white/10 px-6 py-5">
             <div className="flex items-center gap-2 text-[14px] font-normal uppercase leading-[1.4] tracking-[0.04em] text-white">
-              {totalItems > 0 ? (
-                <>
-                  <Check className="size-4 stroke-[2.4]" />
-                  <span>{totalItems} ITEM{totalItems !== 1 && "S"} ADDED</span>
-                </>
-              ) : (
-                <span>SHOPPING BAG (0)</span>
-              )}
+              <span>Shopping bag</span>
+              <span className="grid min-w-6 place-items-center rounded-full bg-white/10 px-1.5 py-0.5 text-[11px] tabular-nums text-white/80">{totalItems}</span>
             </div>
 
             <SheetClose asChild>
               <button
                 type="button"
-                className="inline-flex cursor-pointer items-center gap-1.5 text-[13px] font-normal uppercase tracking-[0.04em] text-white/80 transition-opacity hover:opacity-100"
+                aria-label="Close shopping bag"
+                className="inline-flex size-10 cursor-pointer items-center justify-center rounded-full text-white/75 transition-colors hover:bg-white/10 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
               >
-                <span>CLOSE</span>
                 <X aria-hidden="true" className="size-4 stroke-2" />
               </button>
             </SheetClose>

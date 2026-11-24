@@ -305,6 +305,14 @@
     margin-right: 0 !important;
   }
 
+  /* The page scrolls on <html>, so the lock's `overflow: hidden` on <body> never
+     stopped scrolling; it only made <body> a scroll container, which un-sticks
+     sticky panels (and the dropdowns anchored in them jump off-screen).
+     `clip` is not a scroll container. Wheel and touch are still blocked by the lock. */
+  html body[data-scroll-locked] {
+    overflow: clip !important;
+  }
+
   *::-webkit-scrollbar {
     width: 8px;
     height: 8px;
