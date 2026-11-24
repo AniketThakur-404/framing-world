@@ -330,11 +330,13 @@ export function CollectionFilterDropdown({
         className={isOpen ? "!bg-black !text-white" : ""}
       />
 
-      {isOpen && (
         <div
+          data-open={isOpen}
+          inert={!isOpen}
+          aria-hidden={!isOpen}
           role="menu"
           aria-label={`${group.label} filters`}
-          className="absolute left-0 top-[calc(100%+8px)] z-50 min-w-[250px] border border-black bg-white p-4 text-[13px] font-normal text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
+          className="collection-dropdown absolute left-0 top-[calc(100%+8px)] z-50 min-w-[250px] border border-black bg-white p-4 text-[13px] font-normal text-black shadow-[0_12px_28px_rgba(0,0,0,0.16)]"
         >
           <div className="mb-3 flex items-center justify-between border-b border-black/15 pb-3 font-normal uppercase tracking-[0.04em]">
             <span>{group.label}</span>
@@ -372,7 +374,6 @@ export function CollectionFilterDropdown({
             })}
           </div>
         </div>
-      )}
     </div>
   )
 }

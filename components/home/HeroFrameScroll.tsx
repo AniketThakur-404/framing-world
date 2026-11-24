@@ -6,9 +6,9 @@ import { useEffect, useRef, useState } from "react"
 import { HeroIntro } from "@/components/home/HeroIntro"
 import type { HomeHeroBanner } from "@/lib/store/banners"
 
-const FRAME_COUNT = 240
+const FRAME_COUNT = 360
 const frameSrc = (i: number) =>
-  `/framing_world_webp_frames/frame_${String(i + 1).padStart(4, "0")}.webp`
+  `/framing_frames_jpg_1920_full_quality/frame_${String(i + 1).padStart(4, "0")}.jpg`
 
 /** Frames that must be loaded before the intro opens onto the hero. */
 const READY_FRAMES = 60
@@ -16,7 +16,7 @@ const READY_FRAMES = 60
 const READY_TIMEOUT_MS = 8000
 
 /**
- * Scroll-driven hero: a 250vh section whose sticky canvas plays the 240-frame
+ * Scroll-driven hero: a 250vh section whose sticky canvas plays the 360-frame
  * sequence from first to last frame as the visitor scrolls through it.
  * A brand intro covers the page while the first frames load, then opens onto
  * the hero. No copy over the frames; a "Scroll to explore" hint follows the

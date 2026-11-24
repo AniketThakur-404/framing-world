@@ -1,12 +1,13 @@
 import type { Metadata } from "next"
+import { MouldingCatalogue } from "@/components/collection/MouldingCatalogue"
+import { mouldingSpecs } from "@/lib/studio-content"
 import { redirect } from "next/navigation"
 
 import { CollectionBanner } from "@/components/collection/CollectionBanner"
 import { CollectionBenefitsBar } from "@/components/collection/CollectionBenefitsBar"
-import { CollectionHero } from "@/components/collection/CollectionHero"
 import { CollectionRecommendations } from "@/components/collection/CollectionRecommendations"
 import { CollectionTiles } from "@/components/collection/CollectionTiles"
-import { ProductListing, buildEditorialImages } from "@/components/collection/ProductListing"
+import { ProductListing } from "@/components/collection/ProductListing"
 import { parseSort, sortProducts } from "@/components/collection/productSort"
 import {
   getPublishedCollectionBySlug,
@@ -57,28 +58,18 @@ export default async function Page({
   }
 
   const sort = parseSort(query.sort)
+  if (slug === "molding") return <MouldingCatalogue products={collection.products} specs={mouldingSpecs} />
   const products = sortProducts(
     collection.products,
     sort,
     allProducts.map((product) => product.id),
   )
 
-  const heroImage =
-    collection.image || collection.products[0]?.image || "/images/home/hero-2.webp"
 
   const otherCollections = collections.filter((item) => item.id !== collection.id)
-  // Images chosen in Products → Collections win; otherwise pick them automatically.
-  const editorialImages = collection.editorialImages.length > 0
-    ? collection.editorialImages
-    : buildEditorialImages(
-    collection.products,
-    otherCollections.flatMap((item) =>
-      item.images.slice(0, 1).map((image) => ({
-        ...image,
-        href: `/collections/${item.slug}`,
-      })),
-    ),
-  )
+  // Only intentionally configured editorial banners should span multiple columns.
+  // Product portraits otherwise leave large empty spaces in those wide slots.
+  const editorialImages = collection.editorialImages
 
   // A grid photo linked to a product shows that product's name and price under it.
   const productBySlug = new Map(
@@ -108,13 +99,6 @@ export default async function Page({
 
   return (
     <main className="flex-1 bg-white">
-      <CollectionHero
-        image={heroImage}
-        alt={collection.alt}
-        ctaLabel="Shop now"
-        ctaHref="#products"
-      />
-
       <ProductListing
         id="products"
         title={collection.title}

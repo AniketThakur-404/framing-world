@@ -33,6 +33,7 @@ export type ProductCard = {
 }
 
 export type ProductDetail = {
+  artworkCount?: number
   id?: string
   slug: string
   editLabel: string

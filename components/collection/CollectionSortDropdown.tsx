@@ -76,11 +76,13 @@ export function CollectionSortDropdown({ value = "featured" }: { value?: SortVal
         />
       </button>
 
-      {isOpen && (
         <div
+          data-open={isOpen}
+          inert={!isOpen}
+          aria-hidden={!isOpen}
           role="menu"
           aria-label="Sort products"
-          className="absolute left-0 top-[calc(100%+10px)] z-50 min-w-[220px] border border-black bg-white p-1.5 text-[13px] text-black shadow-[0_12px_28px_rgba(0,0,0,0.12)] sm:text-[14px]"
+          className="collection-dropdown absolute left-0 top-[calc(100%+10px)] z-50 min-w-[220px] border border-black bg-white p-1.5 text-[13px] text-black shadow-[0_12px_28px_rgba(0,0,0,0.12)] sm:text-[14px]"
         >
           {sortOptions.map((option) => (
             <button
@@ -98,7 +100,6 @@ export function CollectionSortDropdown({ value = "featured" }: { value?: SortVal
             </button>
           ))}
         </div>
-      )}
     </div>
   )
 }

@@ -99,7 +99,7 @@ export function CollectionGrid({
         {visibleItems.map((item) =>
           item.kind === "product" ? (
             <div key={item.product.id} className="min-w-0">
-              <ProductCardView product={item.product} />
+              <ProductCardView product={item.product} imageFit="contain" />
             </div>
           ) : (
             <EditorialTile key={item.key} image={item.image} span={item.span} />

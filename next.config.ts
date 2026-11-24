@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   output: "standalone",
   async redirects() {
     return [
+      { source: "/collections", destination: "/collections/shop", permanent: true },
       // Banners saved in admin may still point at the old "/products" listing.
       { source: "/products", destination: "/shop", permanent: false },
       // URLs from the previous Shopify storefront.

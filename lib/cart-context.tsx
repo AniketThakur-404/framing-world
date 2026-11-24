@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useState } from "react"
 import { ProductCard } from "@/components/product/productData"
+import { isMoulding } from "@/lib/custom-framing"
 
 export type CartItem = ProductCard & {
   size: string
@@ -53,6 +54,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
 
 
   const addToCart = (product: ProductCard, size: string) => {
+    if (isMoulding(product)) { window.location.assign(`/quote?details=${encodeURIComponent(product.title || "Moulding enquiry")}`); return }
     // Products without options have a single variant; the label is only for display.
     const resolvedSize = size || (product.sizes && product.sizes.length > 0 ? product.sizes[0] : "Standard")
     const resolvedProduct: ProductCard = {

@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { StudioServices } from "@/components/home/StudioServices"
 
 import { HeroFrameScroll } from "@/components/home/HeroFrameScroll"
 import { CollectionCarousel } from "@/components/home/CollectionCarousel"
@@ -37,6 +38,7 @@ export default async function Home() {
   return (
     <main className="flex-1 bg-black">
       <HeroFrameScroll banner={banners.hero?.[0]} />
+      <StudioServices />
       <SplitBannerSection banners={banners.split} />
       <LaunchOfferBar />
       <TrendingSection products={products.slice(0, 8)} />

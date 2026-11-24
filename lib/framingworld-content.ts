@@ -58,11 +58,12 @@ const imageSizes = imageSizesJson as unknown as Record<string, [number, number]>
 export const faqGroups = faqsJson as unknown as FaqGroup[]
 
 export function getInfoPage(slug: string): InfoPage | null {
+  if (["lasercuttingservice", "cncrouterservice"].includes(slug)) return null
   return Object.prototype.hasOwnProperty.call(pages, slug) ? pages[slug] : null
 }
 
 export function listInfoPages(): InfoPage[] {
-  return Object.values(pages)
+  return Object.values(pages).filter(page => !["lasercuttingservice", "cncrouterservice", "face-mounting"].includes(page.slug))
 }
 
 /** Newest first. */

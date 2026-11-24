@@ -228,17 +228,14 @@ export const DEFAULT_FOOTER_COLUMNS: FooterColumn[] = [
     title: "Printing",
     links: [
       { label: "Printing Service", href: "/pages/printing-services" },
-      { label: "Archival Printing", href: "/pages/archivalprinting" },
-      { label: "Diasec Mounting", href: "/pages/diasec-mounting" },
-      { label: "Face Mounting", href: "/pages/face-mounting" },
+      { label: "Printing Papers", href: "/papers" },
+      { label: "Diasec & Face Mounting", href: "/pages/diasec-mounting" },
     ],
   },
   {
     title: "Services",
     links: [
       { label: "Mount Cutting", href: "/pages/mountcuttingservice" },
-      { label: "Laser Cutting", href: "/pages/lasercuttingservice" },
-      { label: "CNC Router", href: "/pages/cncrouterservice" },
       { label: "Our Gallery", href: "/pages/gallery" },
     ],
   },
@@ -277,6 +274,8 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     // First menu ("Shop"): collection links.
     edits: [
       { label: "Shop All", href: "/shop" },
+      { label: "Custom Mount Board", href: "/products/custom-mount-board" },
+      { label: "Custom Stretcher", href: "/products/custom-stretcher" },
       { label: "Imported Wooden Frames", href: "/collections/imported-wooden-frames" },
       { label: "Wall Gallery", href: "/collections/wall-gallery" },
       { label: "Digital Fine Art", href: "/collections/best-selling-frames" },
@@ -287,21 +286,18 @@ export const DEFAULT_SITE_CONTENT: SiteContent = {
     // Second menu ("Services"), column 1: Printing.
     menCollections: [
       { label: "Printing Services", href: "/pages/printing-services" },
-      { label: "Archival Printing", href: "/pages/archivalprinting" },
-      { label: "Diasec Mounting", href: "/pages/diasec-mounting" },
-      { label: "Face Mounting", href: "/pages/face-mounting" },
+      { label: "Printing Papers", href: "/papers" },
+      { label: "Diasec & Face Mounting", href: "/pages/diasec-mounting" },
     ],
     // Column 2: Services.
     categories: [
-      { label: "Laser Cutting", href: "/pages/lasercuttingservice" },
       { label: "Mount Cutting", href: "/pages/mountcuttingservice" },
-      { label: "CNC Router", href: "/pages/cncrouterservice" },
     ],
     // Column 3: Company.
     menFeatured: [
       { label: "About", href: "/pages/about-us" },
       { label: "Gallery", href: "/pages/gallery" },
-      { label: "Blog", href: "/blogs/news" },
+      { label: "Framing Process", href: "/pages/process-of-framing" },
       { label: "FAQs", href: "/pages/faqs" },
       { label: "Contact", href: "/contact" },
     ],

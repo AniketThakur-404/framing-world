@@ -269,7 +269,7 @@ function MenuCard({
   return (
     <motion.div variants={megaMenuCardVariants} className="shrink-0">
     <Link
-      href={href || "/collections"}
+      href={href || "/collections/shop"}
       tabIndex={open ? 0 : -1}
       onClick={onClose}
       style={{ height: NAV_CARD_HEIGHT }}
@@ -355,7 +355,7 @@ export function Navbar({
   const pathname = usePathname()
   const { navigation } = useSiteContent()
   const primaryNav: PrimaryNavItem[] = [
-    { key: "collections", label: navigation.collectionsLabel || "Shop", href: "/collections", hasMenu: true },
+    { key: "collections", label: navigation.collectionsLabel || "Shop", href: "/collections/shop", hasMenu: true },
     { key: "men", label: "Services", href: "/pages/printing-services", hasMenu: true },
     { key: "bestsellers", label: "Mouldings", href: navigation.bestsellersHref || "/collections/molding", hasMenu: false },
   ]

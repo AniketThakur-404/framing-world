@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic"
 
-export default async function Page() {
+export default async function Page({ searchParams }: { searchParams: Promise<{ sort?: string | string[] }> }) {
+  const { sort } = await searchParams
   return (
     <main className="flex-1 bg-white">
-      <CollectionsHub />
+      <CollectionsHub sort={sort} />
       <CollectionBenefitsBar />
     </main>
   )

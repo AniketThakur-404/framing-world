@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic"
 
 /** Shopify-era URLs that now live elsewhere in this site. */
 const MOVED: Record<string, string> = {
+  "face-mounting": "/pages/diasec-mounting",
   contact: "/contact",
   "privacy-policy": "/privacy",
 }

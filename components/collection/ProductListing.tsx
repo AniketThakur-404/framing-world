@@ -14,6 +14,7 @@ export function ProductListing({
   sort,
   editorialImages,
   emptyState,
+  pageSize,
 }: {
   id?: string
   title: string
@@ -22,6 +23,7 @@ export function ProductListing({
   sort?: SortValue
   editorialImages?: EditorialImage[]
   emptyState?: ReactNode
+  pageSize?: number
 }) {
   return (
     <section id={id} className="w-full scroll-mt-24 bg-white pb-14 pt-8 text-black sm:pb-16 md:pt-10">
@@ -40,6 +42,7 @@ export function ProductListing({
             // Remount on sort change so pagination resets.
             key={sort ?? "featured"}
             products={products}
+            pageSize={pageSize}
             editorialImages={editorialImages}
           />
         ) : (

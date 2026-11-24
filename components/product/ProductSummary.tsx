@@ -24,6 +24,9 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion"
 import { cn } from "@/lib/utils"
+import { isMoulding } from "@/lib/custom-framing"
+import { artworkSlots, type ArtworkAttachment } from "@/lib/artwork"
+import { ArtworkUploads } from "@/components/product/ArtworkUploads"
 import type { ProductDetail } from "@/components/product/productData"
 import type { ProductCard as HomeProductCard } from "@/components/home/TrendingSection"
 import { ScrollRow } from "@/components/ScrollRow"
@@ -179,6 +182,9 @@ export function ProductSummary({
   product: ProductDetail
 }) {
   const [selectedColor, setSelectedColor] = useState(product.colorName)
+  const [artwork, setArtwork] = useState<ArtworkAttachment[]>([])
+  const [uploading, setUploading] = useState(false)
+  const uploadCount = product.artworkCount ?? artworkSlots(product)
   const [plainSize, setPlainSize] = useState(product.sizes[0] ?? "")
 
   // Products with several options (size, glazing, print media…): one group of
@@ -261,6 +267,8 @@ export function ProductSummary({
   }
 
   const handleAddToCart = () => {
+    if (uploading) return
+    if (artwork.length > 0 && artwork.length !== uploadCount) { window.alert(`Please upload one image for each of the ${uploadCount} frames, or remove the uploads to keep the pictured artwork.`); return }
     addToCart(productCard, selectedSize || product.sizes[0] || "")
     setIsCartOpen(true)
   }
@@ -399,13 +407,16 @@ export function ProductSummary({
         ) : null}
 
         {/* Figma: a single full-width outlined Add to Cart (571 x 53). */}
+        {uploadCount > 0 ? <ArtworkUploads count={uploadCount} value={artwork} onChange={setArtwork} onBusy={setUploading} /> : null}
+        {product.slug === "wooden-stretcher" ? <Link href="/products/custom-stretcher" className="block underline">Get a Custom Stretcher</Link> : null}
         <button
+          disabled={uploading}
           ref={addToCartRef}
           type="button"
           onClick={handleAddToCart}
           className="flex h-12 w-full cursor-pointer items-center justify-center btn-sweep border border-black text-[18px] font-medium uppercase tracking-[0.01em] text-black active:scale-[0.99] sm:h-[53px] sm:text-h3"
         >
-          Add To Cart
+          {isMoulding(product) ? "Request a Quote" : "Add To Cart"}
         </button>
 
         {product.offers && product.offers.length > 0 ? (
@@ -610,7 +621,7 @@ export function ProductSummary({
                     onClick={handleAddToCart}
                     className="h-11 shrink-0 cursor-pointer bg-brand-cta px-4 text-button font-medium uppercase text-white transition-colors hover:bg-brand-terracotta sm:px-6"
                   >
-                    Add To Cart
+                    {isMoulding(product) ? "Request a Quote" : "Add To Cart"}
                   </button>
                 </div>
               </div>,

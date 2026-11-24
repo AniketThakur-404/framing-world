@@ -4,7 +4,7 @@ import { WhatsAppCheckout } from "@/components/cart/WhatsAppCheckout"
 
 export const metadata: Metadata = {
   title: "Checkout | Framing World",
-  description: "Send your Framing World order on WhatsApp.",
+  description: "Complete your Framing World order.",
   robots: { index: false, follow: false },
 }
 

@@ -101,6 +101,7 @@ export function ProductCardView({
   product,
   expanded = false,
   variant = "default",
+  imageFit = "cover",
 }: {
   product: ProductCard
   expanded?: boolean
@@ -109,6 +110,7 @@ export function ProductCardView({
    * above a 13px name, and a 14px Medium price.
    */
   variant?: "default" | "compact"
+  imageFit?: "cover" | "contain"
 }) {
   const isCompact = variant === "compact"
   const gallery = product.gallery?.length ? product.gallery : [product.image]
@@ -284,7 +286,8 @@ export function ProductCardView({
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
                 className={cn(
-                  "object-cover object-center md:group-hover:scale-[1.03]",
+                  "object-center",
+                  imageFit === "contain" ? "object-contain" : "object-cover md:group-hover:scale-[1.03]",
                   isActive
                     ? "z-10 opacity-100 transition-opacity duration-150 ease-out"
                     : isPrev
