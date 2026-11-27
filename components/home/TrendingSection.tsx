@@ -254,7 +254,7 @@ export function ProductCardView({
 
   return (
     <article
-      data-reveal="up"
+      data-reveal={isCompact ? undefined : "up"}
       className={cn(
         // No outline on hover/expand (client + updated Figma); no inner padding, so cards sit closer.
         "group relative flex flex-col bg-white text-black pb-2 sm:pb-2.5 hover:z-10",

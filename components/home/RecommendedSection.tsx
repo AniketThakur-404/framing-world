@@ -17,9 +17,9 @@ export function RecommendedSection({
   if (displayProducts.length === 0) return null
 
   return (
-    <section className="w-full bg-white py-10 md:py-16 text-black">
-      <div className="w-full px-3 sm:px-6 lg:px-8">
-        <h2 data-reveal="up" className="type-title">
+    <section className="relative w-full bg-white py-10 md:py-16 text-black z-0">
+      <div className="relative w-full px-3 sm:px-6 lg:px-8 z-10">
+        <h2 className="type-title" data-no-text-reveal>
           You May Also Like
         </h2>
       </div>
