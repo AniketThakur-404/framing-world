@@ -22,6 +22,7 @@ export type CollectionActionState =
 
 function revalidateCollectionPaths(collectionId?: string) {
   revalidatePath("/")
+  revalidatePath("/shop")
   revalidatePath("/collections")
   revalidatePath("/collections/[slug]", "page")
   revalidatePath("/dashboard/products")

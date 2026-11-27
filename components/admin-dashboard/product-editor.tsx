@@ -158,7 +158,7 @@ export function ProductEditor({
 }) {
   const router = useRouter()
   const imageInputRef = useRef<HTMLInputElement>(null)
-  const [title, setTitle] = useState(toAdminUppercase(initialProduct?.title ?? ""))
+  const [title, setTitle] = useState(initialProduct?.title ?? "")
   const [description, setDescription] = useState(initialProduct?.description ?? "")
   const [slug, setSlug] = useState(initialProduct?.slug ?? "")
   const [isCustomSlug, setIsCustomSlug] = useState(Boolean(initialProduct))
@@ -206,10 +206,45 @@ export function ProductEditor({
   }
 
   const updateTitle = (value: string) => {
-    const nextTitle = toAdminUppercase(value)
-    setTitle(nextTitle)
+    setTitle(value)
     if (!isCustomSlug) {
-      setSlug(slugify(nextTitle))
+      setSlug(slugify(value))
+    }
+    markChanged()
+  }
+
+  const updatePrice = (value: string) => {
+    setPrice(value)
+    const num = parseFloat(value)
+    if (!isNaN(num) && num >= 0) {
+      setVariants((current) => current.map((v, i) => (i === 0 ? { ...v, price: num } : v)))
+    }
+    markChanged()
+  }
+
+  const updateCompareAtPrice = (value: string) => {
+    setCompareAtPrice(value)
+    const num = value.trim() === "" ? null : parseFloat(value)
+    if (num === null || (!isNaN(num) && num > 0)) {
+      setVariants((current) => current.map((v, i) => (i === 0 ? { ...v, compareAtPrice: num } : v)))
+    }
+    markChanged()
+  }
+
+  const updateInventoryQuantity = (value: string) => {
+    setInventoryQuantity(value)
+    const num = parseInt(value, 10)
+    if (!isNaN(num) && num >= 0) {
+      setVariants((current) => current.map((v, i) => (i === 0 ? { ...v, inventoryQuantity: num } : v)))
+    }
+    markChanged()
+  }
+
+  const updateSku = (value: string) => {
+    const nextSku = value.toUpperCase()
+    setSku(nextSku)
+    if (nextSku) {
+      setVariants((current) => current.map((v, i) => (i === 0 ? { ...v, sku: nextSku } : v)))
     }
     markChanged()
   }
@@ -360,6 +395,25 @@ export function ProductEditor({
     }
 
     startSaving(async () => {
+      const numPrice = parseFloat(price) || 0
+      const numCompare = compareAtPrice.trim() === "" ? null : (parseFloat(compareAtPrice) || null)
+      const numQuantity = parseInt(inventoryQuantity, 10) || 0
+
+      const syncedVariants = variants.length > 0
+        ? variants.map((v, i) => {
+            if (i === 0) {
+              return {
+                ...v,
+                price: numPrice > 0 ? numPrice : v.price,
+                compareAtPrice: numCompare !== null && numCompare > 0 ? numCompare : v.compareAtPrice,
+                inventoryQuantity: numQuantity >= 0 ? numQuantity : v.inventoryQuantity,
+                ...(sku ? { sku } : {}),
+              }
+            }
+            return v
+          })
+        : []
+
       const input = {
         title,
         slug: effectiveSlug || undefined,
@@ -369,11 +423,11 @@ export function ProductEditor({
         collectionIds,
         tags,
         price,
-        compareAtPrice,
+        compareAtPrice: compareAtPrice.trim() === "" || Number(compareAtPrice) <= 0 ? "" : compareAtPrice,
         inventoryQuantity,
         sku,
         images: images.map((image) => image.objectKey),
-        variants,
+        variants: syncedVariants,
         details: completeDetails,
         pageContent: {
           ...pageContent,
@@ -679,7 +733,7 @@ export function ProductEditor({
                   <span>Price (MRP Inclusive)</span>
                   <span className="relative block">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-black/60">₹</span>
-                    <input aria-label="Price" inputMode="decimal" value={price} onChange={(event) => { setPrice(event.target.value); markChanged() }} aria-invalid={Boolean(errorFor(fieldErrors, "price"))} className={`${inputClass} pl-7`} />
+                    <input aria-label="Price" inputMode="decimal" value={price} onChange={(event) => updatePrice(event.target.value)} aria-invalid={Boolean(errorFor(fieldErrors, "price"))} className={`${inputClass} pl-7`} />
                   </span>
                   {errorFor(fieldErrors, "price") ? <span className="text-xs text-red-700">{errorFor(fieldErrors, "price")}</span> : null}
                 </label>
@@ -687,7 +741,7 @@ export function ProductEditor({
                   <span>Compare-at price</span>
                   <span className="relative block">
                     <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-black/60">₹</span>
-                    <input aria-label="Compare-at price" inputMode="decimal" value={compareAtPrice} onChange={(event) => { setCompareAtPrice(event.target.value); markChanged() }} placeholder="0.00" aria-invalid={Boolean(errorFor(fieldErrors, "compareAtPrice"))} className={`${inputClass} pl-7`} />
+                    <input aria-label="Compare-at price" inputMode="decimal" value={compareAtPrice} onChange={(event) => updateCompareAtPrice(event.target.value)} placeholder="0.00" aria-invalid={Boolean(errorFor(fieldErrors, "compareAtPrice"))} className={`${inputClass} pl-7`} />
                   </span>
                   {errorFor(fieldErrors, "compareAtPrice") ? <span className="text-xs text-red-700">{errorFor(fieldErrors, "compareAtPrice")}</span> : null}
                 </label>
@@ -793,12 +847,12 @@ export function ProductEditor({
               <div className="grid items-start gap-4 px-4 pb-4 sm:grid-cols-2">
                 <label className="grid gap-1.5 text-sm text-black/75">
                   <span>Quantity</span>
-                  <input aria-label="Quantity" inputMode="numeric" min="0" type="number" value={inventoryQuantity} onChange={(event) => { setInventoryQuantity(event.target.value); markChanged() }} aria-invalid={Boolean(errorFor(fieldErrors, "inventoryQuantity"))} className={inputClass} />
+                  <input aria-label="Quantity" inputMode="numeric" min="0" type="number" value={inventoryQuantity} onChange={(event) => updateInventoryQuantity(event.target.value)} aria-invalid={Boolean(errorFor(fieldErrors, "inventoryQuantity"))} className={inputClass} />
                   {errorFor(fieldErrors, "inventoryQuantity") ? <span className="text-xs text-red-700">{errorFor(fieldErrors, "inventoryQuantity")}</span> : null}
                 </label>
                 <label className="grid gap-1.5 text-sm text-black/75">
                   <span>SKU <span className="font-normal text-black/45">(optional)</span></span>
-                  <input value={sku} onChange={(event) => { setSku(event.target.value.toUpperCase()); markChanged() }} placeholder="Generated automatically" aria-invalid={Boolean(errorFor(fieldErrors, "sku"))} className={inputClass} />
+                  <input value={sku} onChange={(event) => updateSku(event.target.value)} placeholder="Generated automatically" aria-invalid={Boolean(errorFor(fieldErrors, "sku"))} className={inputClass} />
                   {errorFor(fieldErrors, "sku") ? <span className="text-xs text-red-700">{errorFor(fieldErrors, "sku")}</span> : <span className="text-xs leading-5 text-black/55">Leave blank to generate a unique SKU.</span>}
                 </label>
               </div>

@@ -1,4 +1,5 @@
 export type BannerTextAlignment = "LEFT" | "CENTER" | "RIGHT"
+import { getHomeBanners as dalGetHomeBanners } from "@/lib/server/dal/banners"
 
 /*
  * Home page banners. Copy and photos are the ones on framingworld.in; edit
@@ -215,5 +216,13 @@ export const HOME_BANNERS: HomeBanners = {
 }
 
 export async function getHomeBanners(): Promise<HomeBanners> {
+  try {
+    const banners = await dalGetHomeBanners()
+    if (banners) {
+      return banners as unknown as HomeBanners
+    }
+  } catch (error) {
+    console.error("[banners] DB getHomeBanners failed, using fallback:", error)
+  }
   return HOME_BANNERS
 }

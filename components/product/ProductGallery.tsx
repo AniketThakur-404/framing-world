@@ -28,8 +28,9 @@ export function ProductGallery({
       <div className="relative block w-full min-w-0 overflow-hidden md:hidden">
         <div
           ref={scrollRef}
+          data-lenis-prevent
           onScroll={handleScroll}
-          className="flex w-full min-w-0 snap-x snap-mandatory overflow-x-auto scrollbar-none [scroll-behavior:smooth]"
+          className="flex w-full min-w-0 snap-x snap-mandatory overflow-x-auto overflow-y-hidden touch-pan-y scrollbar-none [scroll-behavior:smooth]"
         >
           {images.map((image, index) => (
             <figure

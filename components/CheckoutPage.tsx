@@ -32,6 +32,7 @@ import { automaticDiscountFor } from "@/lib/checkout-rules"
 import { loadRazorpayCheckoutScript } from "@/lib/razorpay-client"
 import { getSessionId, track } from "@/lib/analytics-client"
 import { usePageContent } from "@/lib/site-content-context"
+import { validatePhoneNumber, validatePinCode } from "@/lib/validations/checkout"
 
 export type AppliedPromo = {
   code: string
@@ -121,6 +122,8 @@ function FloatingField({
   onChange,
   className = "",
   rightBadge,
+  maxLength,
+  inputMode,
 }: {
   id: string
   label: string
@@ -130,6 +133,8 @@ function FloatingField({
   onChange: (v: string) => void
   className?: string
   rightBadge?: React.ReactNode
+  maxLength?: number
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"]
 }) {
   return (
     <div className={`relative ${className}`}>
@@ -139,6 +144,8 @@ function FloatingField({
         required={required}
         placeholder=" "
         value={value}
+        maxLength={maxLength}
+        inputMode={inputMode}
         onChange={(e) => onChange(e.target.value)}
         className="peer h-[54px] w-full border border-black/25 bg-white px-3.5 pt-4 text-[14px] font-normal tracking-[0.01em] text-black placeholder-transparent outline-none transition focus:border-black"
       />
@@ -657,6 +664,16 @@ export function CheckoutPage() {
 
   const handleContinueToPayment = (e: React.FormEvent) => {
     e.preventDefault()
+    const phoneCheck = validatePhoneNumber(phone)
+    if (!phoneCheck.isValid && phoneCheck.error) {
+      toast.error(phoneCheck.error)
+      return
+    }
+    const pinCheck = validatePinCode(pincode)
+    if (!pinCheck.isValid && pinCheck.error) {
+      toast.error(pinCheck.error)
+      return
+    }
     setStep("payment")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
@@ -673,6 +690,20 @@ export function CheckoutPage() {
 
     if (!email || !firstName || !address || !city || !state || !pincode || !phone) {
       toast.error("Please fill in all required shipping details.")
+      setStep("details")
+      return
+    }
+
+    const phoneCheck = validatePhoneNumber(phone)
+    if (!phoneCheck.isValid && phoneCheck.error) {
+      toast.error(phoneCheck.error)
+      setStep("details")
+      return
+    }
+
+    const pinCheck = validatePinCode(pincode)
+    if (!pinCheck.isValid && pinCheck.error) {
+      toast.error(pinCheck.error)
       setStep("details")
       return
     }
@@ -1091,7 +1122,9 @@ export function CheckoutPage() {
                         label="Zip Code *"
                         required
                         value={pincode}
-                        onChange={setPincode}
+                        maxLength={6}
+                        inputMode="numeric"
+                        onChange={(v) => setPincode(v.replace(/\D/g, "").slice(0, 6))}
                       />
                     </div>
 
@@ -1101,7 +1134,9 @@ export function CheckoutPage() {
                       type="tel"
                       required
                       value={phone}
-                      onChange={setPhone}
+                      maxLength={10}
+                      inputMode="numeric"
+                      onChange={(v) => setPhone(v.replace(/\D/g, "").slice(0, 10))}
                     />
 
                     {/* Free Gift Note Checkbox */}

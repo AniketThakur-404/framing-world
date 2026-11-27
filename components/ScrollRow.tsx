@@ -61,10 +61,11 @@ export function ScrollRow({
     <div className="relative">
       <div
         ref={ref}
+        data-lenis-prevent
         role="region"
         aria-label={label}
         className={cn(
-          "flex snap-x snap-mandatory overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+          "flex snap-x snap-proximity md:snap-mandatory overflow-x-auto overflow-y-hidden touch-pan-y [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
           className,
         )}
         onPointerDown={(e) => {

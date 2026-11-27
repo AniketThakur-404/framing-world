@@ -15,6 +15,11 @@ import {
 } from "@/lib/validations/inventory"
 
 function revalidateInventoryPaths(productIds: string[]) {
+  revalidatePath("/")
+  revalidatePath("/shop")
+  revalidatePath("/collections")
+  revalidatePath("/collections/[slug]", "page")
+  revalidatePath("/products/[slug]", "page")
   revalidatePath("/dashboard/products/inventory")
   revalidatePath("/dashboard/products")
   revalidatePath("/dashboard/products/[productId]", "page")

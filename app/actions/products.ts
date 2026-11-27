@@ -11,12 +11,48 @@ import {
   updateProduct,
   updateProductsStatus,
 } from "@/lib/server/services/products"
+import { permissionErrorMessage } from "@/lib/server/dal/auth"
 import { productInputSchema } from "@/lib/validations/product"
 
 export type ProductActionState =
   | { status: "idle" }
   | { status: "success"; productId: string }
   | { status: "error"; message: string; fields?: Record<string, string[]> }
+
+function mutationError(error: unknown): string {
+  const denied = permissionErrorMessage(error)
+  if (denied) return denied
+  if (error instanceof Error) {
+    if (error.message === "Unauthorized") return "Sign in to continue."
+    if (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:")) {
+      return "Administrator access is required."
+    }
+    if (error.message === "Product not found" || error.message.includes("no longer exist")) {
+      return error.message
+    }
+    if (error.message.includes("P2028") || error.message.includes("timeout") || error.message.includes("Transaction")) {
+      return "The database operation timed out. Please try again."
+    }
+    return error.message
+  }
+  return "The product could not be saved. Try again."
+}
+
+function revalidateProductPaths(productId?: string, slug?: string) {
+  revalidatePath("/")
+  revalidatePath("/shop")
+  revalidatePath("/collections")
+  revalidatePath("/collections/[slug]", "page")
+  revalidatePath("/products/[slug]", "page")
+  if (slug) {
+    revalidatePath(`/products/${slug}`)
+  }
+  revalidatePath("/dashboard/products")
+  revalidatePath("/dashboard/products/inventory")
+  if (productId) {
+    revalidatePath(`/dashboard/products/${productId}`)
+  }
+}
 
 export async function createProductAction(
   input: unknown,
@@ -33,30 +69,17 @@ export async function createProductAction(
 
   try {
     const product = await createProduct(result.data)
-    revalidatePath("/")
-    revalidatePath("/collections")
-    revalidatePath("/products/[slug]", "page")
-    if (product.slug) {
-      revalidatePath(`/products/${product.slug}`)
-    }
-    revalidatePath("/dashboard/products")
+    revalidateProductPaths(product.id, product.slug)
 
     return {
       status: "success",
       productId: product.id,
     }
   } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return { status: "error", message: "Sign in to continue." }
-    }
-
-    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
-      return { status: "error", message: "Administrator access is required." }
-    }
-
+    console.error("[createProductAction] Error saving product:", error)
     return {
       status: "error",
-      message: "The product could not be saved. Try again.",
+      message: mutationError(error),
     }
   }
 }
@@ -77,35 +100,17 @@ export async function updateProductAction(
 
   try {
     const product = await updateProduct(productId, result.data)
-    revalidatePath("/")
-    revalidatePath("/collections")
-    revalidatePath("/products/[slug]", "page")
-    if (product.slug) {
-      revalidatePath(`/products/${product.slug}`)
-    }
-    revalidatePath("/dashboard/products")
-    revalidatePath(`/dashboard/products/${productId}`)
+    revalidateProductPaths(product.id, product.slug)
 
     return {
       status: "success",
       productId: product.id,
     }
   } catch (error) {
-    if (error instanceof Error && error.message === "Unauthorized") {
-      return { status: "error", message: "Sign in to continue." }
-    }
-
-    if (error instanceof Error && (error.message === "Forbidden" || error.message === "SuperAdminRequired" || error.message.startsWith("PermissionDenied:"))) {
-      return { status: "error", message: "Administrator access is required." }
-    }
-
-    if (error instanceof Error && error.message === "Product not found") {
-      return { status: "error", message: "This product no longer exists." }
-    }
-
+    console.error("[updateProductAction] Error updating product:", error)
     return {
       status: "error",
-      message: "The product could not be saved. Try again.",
+      message: mutationError(error),
     }
   }
 }
@@ -119,9 +124,7 @@ export async function deleteProductsAction(productIds: unknown) {
 
   try {
     const deleted = await deleteProducts([...new Set(ids.data)])
-    revalidatePath("/")
-    revalidatePath("/collections")
-    revalidatePath("/dashboard/products")
+    revalidateProductPaths()
     return { success: true, count: deleted.count }
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
@@ -151,9 +154,7 @@ export async function updateProductsStatusAction(
       [...new Set(ids.data)],
       nextStatus.data,
     )
-    revalidatePath("/")
-    revalidatePath("/collections")
-    revalidatePath("/dashboard/products")
+    revalidateProductPaths()
     return { success: true, count: updated.count }
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {
@@ -181,9 +182,7 @@ export async function importProductsAction(input: unknown) {
     for (const product of products.data) {
       await createProduct(product)
     }
-    revalidatePath("/")
-    revalidatePath("/collections")
-    revalidatePath("/dashboard/products")
+    revalidateProductPaths()
 
     return { success: true, count: products.data.length }
   } catch (error) {
@@ -213,7 +212,7 @@ export async function duplicateProductAction(productId: string) {
   if (!id.success) return { success: false as const, message: "Choose a product to duplicate." }
   try {
     const product = await duplicateProduct(id.data)
-    revalidatePath("/dashboard/products")
+    revalidateProductPaths(product.id, product.slug)
     return { success: true as const, productId: product.id }
   } catch (error) {
     if (error instanceof Error && error.message === "Unauthorized") {

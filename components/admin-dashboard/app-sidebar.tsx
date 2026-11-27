@@ -65,6 +65,7 @@ const navMain: NavItem[] = [
     icon: <PackageIcon />,
     items: [
       { title: "Collections", url: "/dashboard/products/collections" },
+      { title: "Categories", url: "/dashboard/products/categories" },
       { title: "Inventory", url: "/dashboard/products/inventory" },
     ],
   },

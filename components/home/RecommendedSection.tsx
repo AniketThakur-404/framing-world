@@ -25,7 +25,7 @@ export function RecommendedSection({
       </div>
 
       <ScrollRow
-        className="reveal-stagger mt-6 sm:mt-8 items-start gap-0.5 overscroll-x-contain px-3 sm:gap-1 sm:px-6 lg:px-8"
+        className="reveal-stagger mt-6 sm:mt-8 items-start gap-0.5 px-3 sm:gap-1 sm:px-6 lg:px-8"
         label="You may also like"
       >
         {displayProducts.map((product) => (

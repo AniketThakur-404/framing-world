@@ -28,6 +28,7 @@ export type BannerActionState =
 
 function revalidateBannerPaths(bannerId?: string) {
   revalidatePath("/")
+  revalidatePath("/shop")
   revalidatePath("/dashboard/banners")
   revalidatePath("/dashboard/banners/new")
 

@@ -9,6 +9,8 @@ export const productImageObjectKeySchema = z
   .refine(
     (key) =>
       key.startsWith("/") ||
+      key.startsWith("http://") ||
+      key.startsWith("https://") ||
       key.startsWith("uploads/") ||
       key.startsWith("products/") ||
       key.startsWith("images/") ||
@@ -21,13 +23,18 @@ export const productImageObjectKeySchema = z
 const optionalMoneySchema = z
   .preprocess(
     (value) => {
-      if (value === null || value === undefined || value === "") {
+      if (value === null || value === undefined || value === "" || value === 0 || value === "0" || value === "0.00") {
         return null
       }
 
-      return Number(value)
+      const num = Number(value)
+      if (!Number.isFinite(num) || num <= 0) {
+        return null
+      }
+
+      return num
     },
-    z.number().finite().nonnegative().max(99_999_999).nullable(),
+    z.number().finite().positive().max(99_999_999).nullable(),
   )
   .optional()
   .transform((value) => value ?? null)
@@ -61,13 +68,17 @@ const skuSchema = z
   .regex(/^[A-Z0-9][A-Z0-9._-]{0,63}$/)
 
 const optionalSkuSchema = z.preprocess(
-  (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
+  (value) => {
+    if (typeof value !== "string" || value.trim() === "") return undefined
+    const clean = value.trim().toUpperCase().replace(/[^A-Z0-9._-]/g, "-")
+    return clean || undefined
+  },
   skuSchema.optional(),
 )
 
 const productVariantSchema = z
   .object({
-    title: z.string().trim().toUpperCase().min(1).max(120).default("DEFAULT"),
+    title: z.string().trim().min(1).max(120).default("DEFAULT"),
     sku: optionalSkuSchema,
     price: requiredMoneySchema,
     compareAtPrice: optionalMoneySchema,
@@ -94,7 +105,7 @@ const productVariantSchema = z
 
 export const productInputSchema = z
   .object({
-    title: z.string().trim().toUpperCase().min(2).max(160),
+    title: z.string().trim().min(2).max(160),
     slug: z
       .string()
       .trim()

@@ -140,11 +140,25 @@ export async function listPublishedProducts(
   const found = await prisma.product.findMany({
     where: {
       status: "ACTIVE",
-      ...(options.ids ? { id: { in: options.ids } } : {}),
-      ...(options.collectionId
-        ? { collections: { some: { collectionId: options.collectionId } } }
+      ...(options.ids
+        ? { OR: [{ id: { in: options.ids } }, { slug: { in: options.ids } }] }
         : {}),
-      ...(options.excludeProductId ? { id: { not: options.excludeProductId } } : {}),
+      ...(options.collectionId
+        ? {
+            collections: {
+              some: {
+                OR: [
+                  { collectionId: options.collectionId },
+                  { collection: { slug: options.collectionId } },
+                  { collection: { id: options.collectionId } },
+                ],
+              },
+            },
+          }
+        : {}),
+      ...(options.excludeProductId
+        ? { AND: [{ id: { not: options.excludeProductId } }, { slug: { not: options.excludeProductId } }] }
+        : {}),
     },
     orderBy: { createdAt: "desc" },
     take: options.take,
@@ -464,8 +478,14 @@ const textLines = (text: string) => text.split("\n").map((line) => line.trim()).
  */
 export async function getProductBySlug(slug: string, options: { preview?: boolean } = {}) {
   const prisma = getPrisma()
-  const product = await prisma.product.findUnique({
-    where: options.preview ? { slug } : { slug, status: "ACTIVE" },
+  const product = await prisma.product.findFirst({
+    where: {
+      OR: [
+        { slug: { equals: slug, mode: "insensitive" } },
+        { id: slug },
+      ],
+      ...(options.preview ? {} : { status: "ACTIVE" }),
+    },
     select: {
       id: true,
       title: true,

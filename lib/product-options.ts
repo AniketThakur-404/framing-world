@@ -47,7 +47,10 @@ function text(value: unknown): string {
 /** One variant as the storefront sees it; null when it has no selectable label. */
 export function readVariantChoice(variant: VariantRow): VariantChoice | null {
   const values = record(variant.optionValues)
-  const size = text(values.Size ?? values.size)
+  const candidateTitle = typeof (variant as any).title === "string" && (variant as any).title.trim()
+    ? (variant as any).title.trim()
+    : "Default"
+  const size = text(values.Size ?? values.size) || candidateTitle
   if (!size) return null
 
   const named = Object.fromEntries(
@@ -60,7 +63,7 @@ export function readVariantChoice(variant: VariantRow): VariantChoice | null {
     Object.keys(named).length > 0
       ? named
       : size.includes(SEPARATOR)
-        ? Object.fromEntries(size.split(SEPARATOR).map((value, index) => [`Option ${index + 1}`, value.trim()]))
+        ? Object.fromEntries(size.split(SEPARATOR).map((value: string, index: number) => [`Option ${index + 1}`, value.trim()]))
         : {}
 
   return {

@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useState } from "react"
 
 import { useCart } from "@/lib/cart-context"
+import { validatePhoneNumber, validatePinCode } from "@/lib/validations/checkout"
 
 /** Number that receives orders. */
 const WHATSAPP_NUMBER = "919810828566"
@@ -20,19 +21,61 @@ const formatRupees = (value: number) => `₹${value.toLocaleString("en-IN", { ma
 export function WhatsAppCheckout() {
   const { cart, clearCart } = useCart()
   const [details, setDetails] = useState({ name: "", phone: "", address: "", city: "", pincode: "", note: "" })
+  const [fieldErrors, setFieldErrors] = useState<{ phone?: string; pincode?: string }>({})
   const [error, setError] = useState("")
 
   const subtotal = cart.reduce((sum, item) => sum + priceValue(item.price) * item.quantity, 0)
 
-  const set = (key: keyof typeof details) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    setDetails((prev) => ({ ...prev, [key]: event.target.value }))
+  const set = (key: keyof typeof details) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    let value = event.target.value
+    if (key === "phone") {
+      value = value.replace(/\D/g, "").slice(0, 10)
+    } else if (key === "pincode") {
+      value = value.replace(/\D/g, "").slice(0, 6)
+    }
+    setDetails((prev) => ({ ...prev, [key]: value }))
+    if (error) setError("")
+    if (fieldErrors[key as keyof typeof fieldErrors]) {
+      setFieldErrors((prev) => ({ ...prev, [key]: undefined }))
+    }
+  }
 
   const sendOrder = (event: React.FormEvent) => {
     event.preventDefault()
-    if (!details.name.trim() || !details.phone.trim() || !details.address.trim()) {
+
+    const phoneValidation = validatePhoneNumber(details.phone)
+    const pinValidation = validatePinCode(details.pincode)
+
+    if (!details.name.trim() || !details.address.trim()) {
+      const newErrors: { phone?: string; pincode?: string } = {}
+      if (!phoneValidation.isValid && phoneValidation.error) {
+        newErrors.phone = phoneValidation.error
+      }
+      if (!pinValidation.isValid && pinValidation.error) {
+        newErrors.pincode = pinValidation.error
+      }
+      setFieldErrors(newErrors)
       setError("Please fill in your name, phone number and delivery address.")
       return
     }
+
+    if (!phoneValidation.isValid || !pinValidation.isValid) {
+      const newErrors: { phone?: string; pincode?: string } = {}
+      const messages: string[] = []
+      if (!phoneValidation.isValid && phoneValidation.error) {
+        newErrors.phone = phoneValidation.error
+        messages.push(phoneValidation.error)
+      }
+      if (!pinValidation.isValid && pinValidation.error) {
+        newErrors.pincode = pinValidation.error
+        messages.push(pinValidation.error)
+      }
+      setFieldErrors(newErrors)
+      setError(messages.join(" "))
+      return
+    }
+
+    setFieldErrors({})
     setError("")
     const lines = [
       "Hello Framing World, I would like to place an order:",
@@ -44,10 +87,10 @@ export function WhatsAppCheckout() {
       "",
       `Subtotal: ${formatRupees(subtotal)}`,
       "",
-      `Name: ${details.name}`,
-      `Phone: ${details.phone}`,
-      `Address: ${details.address}, ${details.city} ${details.pincode}`.trim(),
-      ...(details.note.trim() ? [`Note: ${details.note}`] : []),
+      `Name: ${details.name.trim()}`,
+      `Phone: ${details.phone.trim()}`,
+      `Address: ${details.address.trim()}, ${details.city.trim()} ${details.pincode.trim()}`.trim(),
+      ...(details.note.trim() ? [`Note: ${details.note.trim()}`] : []),
     ]
     window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(lines.join("\n"))}`, "_blank", "noopener")
     clearCart()
@@ -77,13 +120,51 @@ export function WhatsAppCheckout() {
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2">
-            <input className={field} placeholder="Full name *" value={details.name} onChange={set("name")} autoComplete="name" />
-            <input className={field} placeholder="Phone number *" value={details.phone} onChange={set("phone")} autoComplete="tel" inputMode="tel" />
+            <div>
+              <input className={field} placeholder="Full name *" value={details.name} onChange={set("name")} autoComplete="name" />
+            </div>
+            <div>
+              <input
+                className={`${field} ${fieldErrors.phone ? "border-destructive focus:border-destructive" : ""}`}
+                placeholder="Phone number *"
+                value={details.phone}
+                onChange={set("phone")}
+                autoComplete="tel"
+                inputMode="numeric"
+                type="tel"
+                maxLength={10}
+                aria-invalid={Boolean(fieldErrors.phone)}
+              />
+              {fieldErrors.phone ? (
+                <p role="alert" className="mt-1.5 text-[13px] text-destructive">
+                  {fieldErrors.phone}
+                </p>
+              ) : null}
+            </div>
           </div>
           <input className={field} placeholder="Delivery address *" value={details.address} onChange={set("address")} autoComplete="street-address" />
           <div className="grid gap-6 sm:grid-cols-2">
-            <input className={field} placeholder="City" value={details.city} onChange={set("city")} autoComplete="address-level2" />
-            <input className={field} placeholder="PIN code" value={details.pincode} onChange={set("pincode")} autoComplete="postal-code" inputMode="numeric" />
+            <div>
+              <input className={field} placeholder="City" value={details.city} onChange={set("city")} autoComplete="address-level2" />
+            </div>
+            <div>
+              <input
+                className={`${field} ${fieldErrors.pincode ? "border-destructive focus:border-destructive" : ""}`}
+                placeholder="PIN code"
+                value={details.pincode}
+                onChange={set("pincode")}
+                autoComplete="postal-code"
+                inputMode="numeric"
+                type="text"
+                maxLength={6}
+                aria-invalid={Boolean(fieldErrors.pincode)}
+              />
+              {fieldErrors.pincode ? (
+                <p role="alert" className="mt-1.5 text-[13px] text-destructive">
+                  {fieldErrors.pincode}
+                </p>
+              ) : null}
+            </div>
           </div>
           <textarea className={`${field} resize-none`} rows={3} placeholder="Note (custom size, framing instructions…)" value={details.note} onChange={set("note")} />
           {error ? <p role="alert" className="text-[14px] text-destructive">{error}</p> : null}

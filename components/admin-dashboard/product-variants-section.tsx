@@ -212,9 +212,20 @@ export function ProductVariantsSection({
     })
   }, [compareAtPrices, fallbackCompareAtPrice, fallbackInventoryQuantity, fallbackPrice, prices, quantities, values.color, variants])
 
+  const hasActiveVariants = activeOptions.length > 0 && variants.length > 0
+  const isFirstRender = useRef(true)
+
   useEffect(() => {
-    onChange?.(variantDrafts)
-  }, [onChange, variantDrafts])
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      if (!hasActiveVariants) {
+        return
+      }
+    }
+    if (hasActiveVariants) {
+      onChange?.(variantDrafts)
+    }
+  }, [hasActiveVariants, onChange, variantDrafts])
 
   const totalInventory = variants.reduce((total, variant) => total + (Number(quantities[variant.key]) || 0), 0)
   const allVariantsSelected = variants.length > 0 && variants.every((variant) => selectedVariantKeys.includes(variant.key))

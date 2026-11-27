@@ -242,8 +242,11 @@ export async function listPublishedCollections() {
 
 export async function getPublishedCollectionBySlug(slug: string) {
   const prisma = getPrisma()
-  const collection = await prisma.collection.findUnique({
-    where: { slug, isPublished: true },
+  const collection = await prisma.collection.findFirst({
+    where: {
+      OR: [{ slug }, { id: slug }],
+      isPublished: true,
+    },
     select: {
       id: true,
       title: true,

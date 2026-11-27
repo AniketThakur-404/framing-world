@@ -209,6 +209,7 @@ export function normalizePermissions(values: readonly string[]): PermissionKey[]
 export const DASHBOARD_ROUTE_PERMISSIONS: Array<{ prefix: string; permission: PermissionKey }> = [
   { prefix: "/dashboard/orders", permission: "orders.view" },
   { prefix: "/dashboard/products/collections", permission: "collections.view" },
+  { prefix: "/dashboard/products/categories", permission: "categories.view" },
   { prefix: "/dashboard/products/inventory", permission: "inventory.view" },
   { prefix: "/dashboard/products", permission: "products.view" },
   { prefix: "/dashboard/customers", permission: "customers.view" },

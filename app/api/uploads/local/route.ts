@@ -1,4 +1,5 @@
 import { mkdir, writeFile } from "node:fs/promises"
+import { tmpdir } from "node:os"
 import { dirname, resolve } from "node:path"
 
 import { z } from "zod"
@@ -21,10 +22,6 @@ const localUploadSchema = z.object({
 })
 
 export async function PUT(request: Request) {
-  if (process.env.NODE_ENV !== "development") {
-    return Response.json({ error: "Not found" }, { status: 404 })
-  }
-
   const user = await getCurrentUser()
 
   if (!user) {
@@ -88,8 +85,14 @@ export async function PUT(request: Request) {
     return Response.json({ error: "Invalid upload destination" }, { status: 400 })
   }
 
-  await mkdir(dirname(destination), { recursive: true })
-  await writeFile(destination, image)
+  try {
+    await mkdir(dirname(destination), { recursive: true })
+    await writeFile(destination, image)
+  } catch {
+    const tmpDestination = resolve(tmpdir(), input.data.objectKey)
+    await mkdir(dirname(tmpDestination), { recursive: true })
+    await writeFile(tmpDestination, image)
+  }
 
   return Response.json({ success: true })
 }

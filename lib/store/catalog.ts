@@ -12,6 +12,15 @@ import {
 } from "@/lib/product-options"
 import { SYNONYM_MAP, damerauLevenshteinDistance } from "@/lib/search/fuzzy"
 import { DEFAULT_SITE_CONTENT } from "@/lib/site-content"
+import {
+  listPublishedProducts as dalListPublishedProducts,
+  getProductBySlug as dalGetProductBySlug,
+} from "@/lib/server/dal/products"
+import {
+  getPublishedCollectionBySlug as dalGetPublishedCollectionBySlug,
+  listPublishedCollectionsWithImages as dalListPublishedCollectionsWithImages,
+} from "@/lib/server/dal/collections"
+import { searchCatalog as dalSearchCatalog } from "@/lib/server/dal/search"
 
 /**
  * The product catalogue, read straight from content/framingworld/catalog
@@ -115,6 +124,15 @@ function toCard(product: CatalogProduct): CatalogProductCard {
 export async function listPublishedProducts(
   options: { collectionId?: string; excludeProductId?: string; take?: number; ids?: string[] } = {},
 ): Promise<CatalogProductCard[]> {
+  try {
+    const dbProducts = await dalListPublishedProducts(options)
+    if (dbProducts !== undefined && dbProducts !== null) {
+      return dbProducts as CatalogProductCard[]
+    }
+  } catch (error) {
+    console.error("[catalog] DB listPublishedProducts failed, using fallback:", error)
+  }
+
   let list: CatalogProduct[]
   if (options.ids) {
     list = options.ids.map((id) => productByHandle.get(id)).filter((p): p is CatalogProduct => Boolean(p))
@@ -148,6 +166,15 @@ function textLines(text: string) {
 }
 
 export async function getProductBySlug(slug: string): Promise<CatalogProductDetail | null> {
+  try {
+    const dbProduct = await dalGetProductBySlug(slug)
+    if (dbProduct) {
+      return dbProduct as unknown as CatalogProductDetail
+    }
+  } catch (error) {
+    console.error("[catalog] DB getProductBySlug failed, using fallback:", error)
+  }
+
   const product = productByHandle.get(slug)
   if (!product) return null
 
@@ -235,7 +262,28 @@ function collectionCover(collection: CatalogCollection) {
   )
 }
 
-export async function getPublishedCollectionBySlug(slug: string) {
+export type PublishedCollectionDetail = {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  image: string
+  alt: string
+  products: CatalogProductCard[]
+  editorialImages: { src: string; alt: string; href?: string; caption?: string }[]
+  banner: { src: string; alt: string; href?: string; caption?: string } | null
+}
+
+export async function getPublishedCollectionBySlug(slug: string): Promise<PublishedCollectionDetail | null> {
+  try {
+    const dbCollection = await dalGetPublishedCollectionBySlug(slug)
+    if (dbCollection) {
+      return dbCollection as unknown as PublishedCollectionDetail
+    }
+  } catch (error) {
+    console.error("[catalog] DB getPublishedCollectionBySlug failed, using fallback:", error)
+  }
+
   const collection = collectionByHandle.get(slug)
   if (!collection) return null
   return {
@@ -263,6 +311,15 @@ export type PublishedCollectionWithImages = {
 }
 
 export async function listPublishedCollectionsWithImages(maxImages = 5): Promise<PublishedCollectionWithImages[]> {
+  try {
+    const dbCollections = await dalListPublishedCollectionsWithImages(maxImages)
+    if (dbCollections && dbCollections.length > 0) {
+      return dbCollections
+    }
+  } catch (error) {
+    console.error("[catalog] DB listPublishedCollectionsWithImages failed, using fallback:", error)
+  }
+
   return collections.map((collection) => {
     const cover = collectionCover(collection)
     const productImages = collection.productHandles
@@ -322,6 +379,15 @@ const vocabulary = Array.from(
 ).filter((word) => word.length > 2)
 
 export async function searchCatalog(rawQuery: string): Promise<SearchResponse> {
+  try {
+    const dbSearch = await dalSearchCatalog(rawQuery)
+    if (dbSearch && (dbSearch.products.length > 0 || dbSearch.collections.length > 0 || dbSearch.categories.length > 0)) {
+      return dbSearch
+    }
+  } catch (error) {
+    console.error("[catalog] DB searchCatalog failed, using fallback:", error)
+  }
+
   const query = rawQuery.trim()
   const terms = words(query)
   const empty: SearchResponse = { query, suggestion: null, hasExactMatch: false, products: [], categories: [], collections: [], totalCount: 0 }

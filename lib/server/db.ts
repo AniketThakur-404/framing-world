@@ -23,7 +23,7 @@ function createPrismaClient() {
   const { DATABASE_URL } = getDatabaseEnv()
   const adapter = new PrismaPg({
     connectionString: DATABASE_URL,
-    connectionTimeoutMillis: 5_000,
+    connectionTimeoutMillis: 20_000,
     max: 10,
   })
 

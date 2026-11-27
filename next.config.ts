@@ -22,19 +22,13 @@ const nextConfig: NextConfig = {
   images: {
     qualities: [75, 90],
     remotePatterns: [
-      ...(process.env.R2_PUBLIC_URL
-        ? [
-            {
-              protocol: "https" as const,
-              hostname: new URL(process.env.R2_PUBLIC_URL).hostname,
-              pathname: "/**",
-            },
-          ]
-        : []),
       {
-        protocol: "https" as const,
-        hostname: "*.googleusercontent.com",
-        pathname: "/**",
+        protocol: "https",
+        hostname: "**",
+      },
+      {
+        protocol: "http",
+        hostname: "**",
       },
     ],
   },

@@ -19,7 +19,10 @@ import {
 } from "@/lib/server/services/razorpay"
 import {
   checkoutInputSchema,
+  phoneSchema,
+  pinCodeSchema,
   razorpayConfirmationSchema,
+  whatsAppCheckoutSchema,
 } from "@/lib/validations/checkout"
 
 export type PlaceOrderResult =
@@ -275,4 +278,58 @@ export async function placeOrderAction(input: unknown): Promise<PlaceOrderResult
       message: "We couldn’t place your order right now. Please try again in a moment.",
     }
   }
+}
+
+export type ValidateCheckoutFieldsResult =
+  | { success: true }
+  | {
+      success: false
+      errors: { phone?: string; pincode?: string }
+      message: string
+    }
+
+/**
+ * Validates checkout inputs (phone number, PIN code) on the backend.
+ */
+export async function validateCheckoutFieldsAction(input: {
+  phone?: string
+  pincode?: string
+  postalCode?: string
+}): Promise<ValidateCheckoutFieldsResult> {
+  const phone = input.phone ?? ""
+  const pin = input.pincode ?? input.postalCode ?? ""
+
+  const phoneRes = phoneSchema.safeParse(phone)
+  const pinRes = pinCodeSchema.safeParse(pin)
+
+  if (!phoneRes.success || !pinRes.success) {
+    const errors: { phone?: string; pincode?: string } = {}
+    if (!phoneRes.success) {
+      errors.phone = phoneRes.error.issues[0]?.message ?? "Phone number must be exactly 10 digits, numbers only."
+    }
+    if (!pinRes.success) {
+      errors.pincode = pinRes.error.issues[0]?.message ?? "PIN code must be exactly 6 digits, numbers only, and cannot start with 0."
+    }
+    const message = [errors.phone, errors.pincode].filter(Boolean).join(" ")
+    return { success: false, errors, message }
+  }
+
+  return { success: true }
+}
+
+/**
+ * Validates complete WhatsApp checkout form data on the backend.
+ */
+export async function validateWhatsAppCheckoutAction(input: unknown) {
+  const result = whatsAppCheckoutSchema.safeParse(input)
+  if (!result.success) {
+    const flat = z.flattenError(result.error)
+    const firstField = Object.values(flat.fieldErrors).flat().find(Boolean)
+    return {
+      success: false,
+      errors: flat.fieldErrors,
+      message: flat.formErrors[0] ?? firstField ?? "Please check your details and try again.",
+    }
+  }
+  return { success: true, data: result.data }
 }

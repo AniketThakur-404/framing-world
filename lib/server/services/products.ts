@@ -197,7 +197,15 @@ export async function updateProduct(productId: string, input: ProductInput) {
       id: true,
       variants: {
         orderBy: { createdAt: "asc" },
-        select: { id: true, sku: true },
+        select: {
+          id: true,
+          sku: true,
+          title: true,
+          price: true,
+          compareAtPrice: true,
+          inventoryQuantity: true,
+          optionValues: true,
+        },
       },
       images: { select: { objectKey: true } },
     },
@@ -229,26 +237,75 @@ export async function updateProduct(productId: string, input: ProductInput) {
   const slug = await createAvailableSlug(product.slug ?? product.title, productId)
   const requestedVariants = product.variants.length > 0
     ? product.variants
-    : [{
-        title: "Default",
-        sku: product.sku,
-        price: product.price,
-        compareAtPrice: product.compareAtPrice,
-        inventoryQuantity: product.inventoryQuantity,
-        optionValues: {},
-      }]
+    : existing.variants.length > 0
+      ? existing.variants.map((v) => ({
+          title: v.title,
+          sku: v.sku,
+          price: Number(v.price),
+          compareAtPrice: v.compareAtPrice !== null ? Number(v.compareAtPrice) : null,
+          inventoryQuantity: v.inventoryQuantity,
+          optionValues: (v.optionValues && typeof v.optionValues === "object" ? v.optionValues : {}) as Record<string, any>,
+        }))
+      : [{
+          title: "Default",
+          sku: product.sku,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice,
+          inventoryQuantity: product.inventoryQuantity,
+          optionValues: {},
+        }]
 
+  if (requestedVariants.length > 0 && product.price > 0) {
+    requestedVariants[0].price = product.price
+    if (product.compareAtPrice !== undefined) {
+      requestedVariants[0].compareAtPrice = product.compareAtPrice
+    }
+    if (product.inventoryQuantity !== undefined) {
+      requestedVariants[0].inventoryQuantity = product.inventoryQuantity
+    }
+    if (product.sku) {
+      requestedVariants[0].sku = product.sku
+    }
+  }
+
+  const existingSkuSet = new Set(existing.variants.map((v) => v.sku))
   const variants: Array<
     Omit<ProductInput["variants"][number], "sku"> & { sku: string }
   > = []
+
+  const candidatesToCheck: { index: number; candidate: string }[] = []
   for (const [index, variant] of requestedVariants.entries()) {
     const existingVariant = existing.variants[index]
     const requestedSku = variant.sku || existingVariant?.sku || product.sku || `FW-${slug}`
-    const sku = existingVariant?.sku === requestedSku
-      ? requestedSku
-      : await createAvailableSku(requestedSku, index + 1)
+    if (existingVariant?.sku === requestedSku || existingSkuSet.has(requestedSku)) {
+      variants.push({ ...variant, sku: requestedSku })
+    } else {
+      const baseSku = skuify(requestedSku)
+      const candidate = (index + 1) === 1 ? baseSku : `${baseSku}-${index + 1}`
+      candidatesToCheck.push({ index, candidate })
+      variants.push({ ...variant, sku: candidate })
+    }
+  }
 
-    variants.push({ ...variant, sku })
+  if (candidatesToCheck.length > 0) {
+    const matchingSkus = await prisma.productVariant.findMany({
+      where: {
+        sku: { in: candidatesToCheck.map((c) => c.candidate) },
+        NOT: { productId },
+      },
+      select: { sku: true },
+    })
+    const usedSkus = new Set(matchingSkus.map((v) => v.sku))
+    for (const item of candidatesToCheck) {
+      let finalSku = item.candidate
+      let collision = 2
+      while (usedSkus.has(finalSku)) {
+        finalSku = `${item.candidate}-${collision}`
+        collision += 1
+      }
+      usedSkus.add(finalSku)
+      variants[item.index].sku = finalSku
+    }
   }
 
   const existingImageKeys = new Set(
@@ -304,47 +361,64 @@ export async function updateProduct(productId: string, input: ProductInput) {
                   : {}),
               },
             })
-          : transaction.productImage.create({
-              data: { productId, objectKey, position, altText: product.imageAltTexts?.[objectKey] || null },
+          : transaction.productImage.upsert({
+              where: { objectKey },
+              create: { productId, objectKey, position, altText: product.imageAltTexts?.[objectKey] || null },
+              update: { productId, position, altText: product.imageAltTexts?.[objectKey] || null },
             }),
       ),
     )
 
-    await Promise.all(
-      variants.map((variant, index) => {
-        const data = {
-          title: variant.title,
-          sku: variant.sku,
-          price: new Prisma.Decimal(variant.price.toFixed(2)),
-          compareAtPrice:
-            variant.compareAtPrice === null
-              ? null
-              : new Prisma.Decimal(variant.compareAtPrice.toFixed(2)),
-          inventoryQuantity: variant.inventoryQuantity,
-          optionValues:
-            Object.keys(variant.optionValues).length > 0
-              ? (variant.optionValues as Prisma.InputJsonValue)
-              : Prisma.JsonNull,
+    const variantPromises: Promise<any>[] = []
+    for (const [index, variant] of variants.entries()) {
+      const existingVariant = existing.variants[index] as any
+      const data = {
+        title: variant.title,
+        sku: variant.sku,
+        price: new Prisma.Decimal(variant.price.toFixed(2)),
+        compareAtPrice:
+          variant.compareAtPrice === null
+            ? null
+            : new Prisma.Decimal(variant.compareAtPrice.toFixed(2)),
+        inventoryQuantity: variant.inventoryQuantity,
+        optionValues:
+          Object.keys(variant.optionValues).length > 0
+            ? (variant.optionValues as Prisma.InputJsonValue)
+            : Prisma.JsonNull,
+      }
+
+      if (!existingVariant) {
+        variantPromises.push(transaction.productVariant.create({ data: { productId, ...data } }))
+      } else {
+        const isChanged =
+          existingVariant.title !== variant.title ||
+          existingVariant.sku !== variant.sku ||
+          Number(existingVariant.price) !== Number(variant.price) ||
+          Number(existingVariant.compareAtPrice ?? null) !== Number(variant.compareAtPrice ?? null) ||
+          existingVariant.inventoryQuantity !== variant.inventoryQuantity ||
+          JSON.stringify(existingVariant.optionValues ?? {}) !== JSON.stringify(variant.optionValues ?? {})
+
+        if (isChanged) {
+          variantPromises.push(transaction.productVariant.update({ where: { id: existingVariant.id }, data }))
         }
+      }
+    }
 
-        const existingVariant = existing.variants[index]
-        return existingVariant
-          ? transaction.productVariant.update({ where: { id: existingVariant.id }, data })
-          : transaction.productVariant.create({ data: { productId, ...data } })
-      }),
-    )
+    await Promise.all(variantPromises)
 
-    const removedVariantIds = existing.variants
-      .slice(variants.length)
-      .map((variant) => variant.id)
-    if (removedVariantIds.length > 0) {
-      await transaction.productVariant.deleteMany({
-        where: { id: { in: removedVariantIds } },
-      })
+    if (product.variants.length > 0 && variants.length < existing.variants.length) {
+      const removedVariantIds = existing.variants
+        .slice(variants.length)
+        .map((variant) => variant.id)
+      if (removedVariantIds.length > 0) {
+        await transaction.productVariant.deleteMany({
+          where: { id: { in: removedVariantIds } },
+        })
+      }
     }
 
     return updated
-  })
+  }, { maxWait: 20000, timeout: 60000 })
 }
 
 export async function deleteProducts(productIds: string[]) {

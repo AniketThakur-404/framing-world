@@ -17,6 +17,9 @@ import {
 } from "@/lib/validations/discount"
 
 function revalidateDiscountPaths(ids: string[] = []) {
+  revalidatePath("/")
+  revalidatePath("/shop")
+  revalidatePath("/products/[slug]", "page")
   revalidatePath("/dashboard/discounts")
   revalidatePath("/dashboard/discounts/new")
   revalidatePath("/dashboard/discounts/amount-off-order")

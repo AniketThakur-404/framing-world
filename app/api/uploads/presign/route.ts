@@ -91,17 +91,7 @@ export async function POST(request: Request) {
   try {
     env = getR2Env()
   } catch {
-    if (process.env.NODE_ENV === "development") {
-      return createLocalUploadResponse(input.data)
-    }
-
-    return Response.json(
-      {
-        error:
-          "Image storage is not configured. Set a valid R2_PUBLIC_URL before uploading images.",
-      },
-      { status: 503 },
-    )
+    return createLocalUploadResponse(input.data)
   }
   const extension = extensionByContentType[input.data.contentType]
   const folder = input.data.scope === "category"
@@ -124,11 +114,9 @@ export async function POST(request: Request) {
       }),
       { expiresIn: 5 * 60 },
     )
-  } catch {
-    return Response.json(
-      { error: "Upload service unavailable" },
-      { status: 503 },
-    )
+  } catch (error) {
+    console.error("[uploads/presign] S3 presign failed, falling back to local upload:", error)
+    return createLocalUploadResponse(input.data)
   }
 
   return Response.json({

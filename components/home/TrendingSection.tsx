@@ -265,13 +265,13 @@ export function ProductCardView({
         data-row-media
         data-card-zoom
         className={cn(
-          "relative aspect-[2/3] w-full overflow-hidden bg-white touch-pan-y select-none",
-          isCompact ? "sm:aspect-[234/342]" : "sm:aspect-[330/440]"
+          "relative aspect-[2/3] w-full overflow-hidden bg-white select-none",
+          isCompact ? "touch-manipulation sm:aspect-[234/342]" : "touch-pan-y sm:aspect-[330/440]"
         )}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
+        onTouchStart={isCompact ? undefined : handleTouchStart}
+        onTouchEnd={isCompact ? undefined : handleTouchEnd}
       >
         {gallery.length > 0 ? (
           gallery.map((imgSrc, idx) => {
