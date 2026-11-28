@@ -1,6 +1,7 @@
 import "server-only"
 
 import { getPrisma } from "@/lib/server/db"
+import { productImageUrl } from "@/lib/server/image-url"
 import type { TrackOrderLookup } from "@/lib/validations/contact"
 
 export type TrackedOrder = {
@@ -11,10 +12,28 @@ export type TrackedOrder = {
   placedAt: string
   total: number
   currency: string
+  subtotal: number
+  shipping: number
+  discount: number
+  paymentMethod: string | null
   itemCount: number
-  items: Array<{ title: string; quantity: number }>
+  items: Array<{
+    title: string
+    quantity: number
+    total: number
+    image: string | null
+    imageAlt: string
+  }>
   shippingMethod: string | null
   city: string | null
+  shippingAddress: {
+    name: string | null
+    line: string
+  } | null
+}
+
+function str(value: unknown) {
+  return typeof value === "string" && value.trim() ? value.trim() : null
 }
 
 const STATUS_COPY: Record<TrackedOrder["status"], { label: string; detail: string }> = {
@@ -45,16 +64,39 @@ export async function findOrderForTracking(lookup: TrackOrderLookup): Promise<Tr
   if (!Number.isFinite(number) || number <= 0) return null
 
   const order = await getPrisma().order.findFirst({
-    where: { number, email: lookup.email },
+    where: { number, email: { equals: lookup.email, mode: "insensitive" } },
     select: {
       number: true,
       status: true,
       total: true,
+      shipping: true,
+      discount: true,
+      paymentMethod: true,
       currency: true,
       createdAt: true,
       shippingMethod: true,
       shippingAddress: true,
-      items: { select: { title: true, quantity: true } },
+      items: {
+        select: {
+          title: true,
+          quantity: true,
+          total: true,
+          variant: {
+            select: {
+              product: {
+                select: {
+                  title: true,
+                  images: {
+                    select: { objectKey: true, altText: true },
+                    orderBy: { position: "asc" },
+                    take: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
   })
 
@@ -72,6 +114,26 @@ export async function findOrderForTracking(lookup: TrackOrderLookup): Promise<Tr
 
   const copy = STATUS_COPY[order.status]
 
+  const items = order.items.map((item) => {
+    const image = item.variant?.product.images[0]
+    return {
+      title: item.title,
+      quantity: item.quantity,
+      total: Number(item.total),
+      image: productImageUrl(image?.objectKey),
+      imageAlt: image?.altText || item.variant?.product.title || item.title,
+    }
+  })
+
+  const addressLine = [
+    str(address?.address1),
+    str(address?.address2),
+    str(address?.city),
+    [str(address?.state), postalCode].filter(Boolean).join(" ") || null,
+  ]
+    .filter(Boolean)
+    .join(", ")
+
   return {
     reference: `FW-${String(order.number).padStart(5, "0")}`,
     status: order.status,
@@ -79,10 +141,15 @@ export async function findOrderForTracking(lookup: TrackOrderLookup): Promise<Tr
     statusDetail: copy.detail,
     placedAt: order.createdAt.toISOString(),
     total: Number(order.total),
+    subtotal: items.reduce((sum, item) => sum + item.total, 0),
+    shipping: Number(order.shipping),
+    discount: Number(order.discount),
+    paymentMethod: order.paymentMethod,
     currency: order.currency,
     itemCount: order.items.reduce((sum, item) => sum + item.quantity, 0),
-    items: order.items,
+    items,
     shippingMethod: order.shippingMethod,
-    city: typeof address?.city === "string" ? address.city : null,
+    city: str(address?.city),
+    shippingAddress: address ? { name: str(address.name), line: addressLine } : null,
   }
 }

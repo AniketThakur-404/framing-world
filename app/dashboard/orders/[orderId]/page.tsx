@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
+import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import {
   Building2,
   ChevronRight,
+  ImageOff,
   Landmark,
   Package,
   Receipt,
@@ -133,10 +135,36 @@ export default async function OrderDetailPage({
                           {order.items.map((item) => (
                             <tr key={item.id}>
                               <td className="border-b border-black/10 px-4 py-3">
-                                <p className="font-medium text-black">{item.title}</p>
-                                <p className="mt-0.5 font-mono text-xs text-black/50">
-                                  {item.sku}
-                                </p>
+                                <div className="flex items-center gap-3">
+                                  <div className="relative size-14 shrink-0 overflow-hidden rounded-lg border border-black/10 bg-black/3">
+                                    {item.image ? (
+                                      <Image
+                                        src={item.image}
+                                        alt={item.imageAlt}
+                                        fill
+                                        sizes="56px"
+                                        className="object-cover"
+                                      />
+                                    ) : (
+                                      <ImageOff className="absolute inset-0 m-auto size-4 text-black/30" />
+                                    )}
+                                  </div>
+                                  <div className="min-w-0">
+                                    {item.productId ? (
+                                      <Link
+                                        href={`/dashboard/products/${item.productId}`}
+                                        className="font-medium text-black hover:underline"
+                                      >
+                                        {item.title}
+                                      </Link>
+                                    ) : (
+                                      <p className="font-medium text-black">{item.title}</p>
+                                    )}
+                                    <p className="mt-0.5 font-mono text-xs text-black/50">
+                                      {item.sku}
+                                    </p>
+                                  </div>
+                                </div>
                               </td>
                               <td className="border-b border-black/10 px-4 py-3 text-center">
                                 {item.quantity}

@@ -31,8 +31,9 @@ export function SmoothMotion() {
       smoothWheel: true,
       anchors: true,
       autoRaf: true,
-      // Let drawers, dialogs and inner scroll areas scroll natively.
-      prevent: (node) => Boolean(node.closest?.('[role="dialog"], [data-lenis-prevent], [data-radix-scroll-area-viewport], [role="region"]')),
+      // Let drawers, dialogs and inner scroll areas scroll natively. Horizontal rows
+      // use data-lenis-prevent-horizontal so a vertical wheel over them still scrolls the page.
+      prevent: (node) => Boolean(node.closest?.('[role="dialog"], [data-lenis-prevent], [data-radix-scroll-area-viewport]')),
     })
 
     // Pause while a dialog or drawer locks the page (Radix sets data-scroll-locked on <body>)

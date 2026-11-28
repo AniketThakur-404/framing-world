@@ -5,11 +5,8 @@ import Image from "next/image"
 import { useEffect, useState } from "react"
 import {
   ChevronDown,
-  Check,
   LoaderCircle,
   Tag,
-  ShoppingBag,
-  HelpCircle,
   CreditCard,
   QrCode,
   Building2,
@@ -213,13 +210,17 @@ function FloatingSelect({
 }
 
 
+type PaymentChoice = "online" | "cod"
+
 function PaymentSection({
-  billingSame,
-  setBillingSame,
+  method,
+  setMethod,
+  onlinePaymentEnabled,
   isFreeOrder = false,
 }: {
-  billingSame: boolean
-  setBillingSame: (v: boolean) => void
+  method: PaymentChoice
+  setMethod: (v: PaymentChoice) => void
+  onlinePaymentEnabled: boolean
   isFreeOrder?: boolean
 }) {
   const page = usePageContent("checkoutPage")
@@ -250,73 +251,60 @@ function PaymentSection({
           </div>
         </div>
       ) : (
-        /* Unified Razorpay Secure Payment Card */
-        <div className="border border-black/25 bg-white">
-          <div className="flex items-center justify-between p-4 bg-black/[0.02]">
-            <div className="flex items-center gap-3.5">
-              <div className="flex size-4 shrink-0 items-center justify-center rounded-full border-2 border-black">
-                <span className="size-2 rounded-full bg-black" />
-              </div>
-              <div>
-                <span className="text-[13px] font-normal uppercase tracking-[0.04em] text-black">
-                  Razorpay Secure
+        <div role="radiogroup" aria-label="Payment method" className="divide-y divide-black/15 border border-black/25 bg-white">
+          {onlinePaymentEnabled ? (
+            <label className={`flex cursor-pointer items-center justify-between gap-4 p-4 ${method === "online" ? "bg-black/[0.03]" : ""}`}>
+              <span className="flex items-center gap-3.5">
+                <input
+                  type="radio"
+                  name="payment-method"
+                  checked={method === "online"}
+                  onChange={() => setMethod("online")}
+                  className="size-4 accent-black"
+                />
+                <span>
+                  <span className="block text-[13px] font-normal uppercase tracking-[0.04em] text-black">
+                    Pay online
+                  </span>
+                  <span className="block text-[11px] text-black/50">
+                    UPI (Google Pay, PhonePe, Paytm), Cards, Net Banking &amp; Wallets via Razorpay
+                  </span>
                 </span>
-                <p className="text-[11px] text-black/50">
-                  UPI (Google Pay, PhonePe, Paytm), Cards, Net Banking &amp; Wallets
-                </p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <QrCode className="size-4 text-black/60" />
-              <CreditCard className="size-4 text-black/60" />
-              <Building2 className="size-4 text-black/60" />
-            </div>
-          </div>
-
-          <div className="border-t border-black/10 bg-neutral-50 p-4 text-[12px] leading-relaxed text-black/70">
-            <p>
-              After clicking <strong>Pay with Razorpay</strong>, the secure Razorpay checkout window will open with all payment options (Google Pay, PhonePe, Paytm, QR Code, Debit/Credit Cards, and Net Banking).
-            </p>
-          </div>
+              </span>
+              <span className="flex items-center gap-2">
+                <QrCode className="size-4 text-black/60" />
+                <CreditCard className="size-4 text-black/60" />
+                <Building2 className="size-4 text-black/60" />
+              </span>
+            </label>
+          ) : null}
+          <label className={`flex cursor-pointer items-center justify-between gap-4 p-4 ${method === "cod" ? "bg-black/[0.03]" : ""}`}>
+            <span className="flex items-center gap-3.5">
+              <input
+                type="radio"
+                name="payment-method"
+                checked={method === "cod"}
+                onChange={() => setMethod("cod")}
+                className="size-4 accent-black"
+              />
+              <span>
+                <span className="block text-[13px] font-normal uppercase tracking-[0.04em] text-black">
+                  Cash on Delivery
+                </span>
+                <span className="block text-[11px] text-black/50">
+                  Pay in cash or UPI when your order arrives. We will call to confirm before dispatch.
+                </span>
+              </span>
+            </span>
+            <Truck className="size-4 text-black/60" />
+          </label>
         </div>
       )}
 
       {/* Security Badge */}
-      <div className="flex items-center justify-between border border-black/15 bg-black/[0.02] px-4 py-3 text-[12px] text-black/75">
-        <div className="flex items-center gap-2">
-          <Lock className="size-3.5 text-black/70" />
-          <span className="font-normal uppercase tracking-[0.04em]">100% Encrypted &amp; Secure Checkout</span>
-        </div>
-        <span className="text-[11px] uppercase tracking-[0.04em] text-black/50">Razorpay Live</span>
-      </div>
-
-      {/* Billing Address Option */}
-      <div className="space-y-3 pt-2">
-        <h3 className="text-[14px] font-normal uppercase tracking-[0.04em] text-black">
-          Billing Address
-        </h3>
-        <div className="divide-y divide-black/15 border border-black/25">
-          <label className="flex cursor-pointer items-center gap-3 p-3.5">
-            <input
-              type="radio"
-              name="billing"
-              checked={billingSame}
-              onChange={() => setBillingSame(true)}
-              className="size-4 accent-black"
-            />
-            <span className="text-[13px] text-black">Same as shipping address</span>
-          </label>
-          <label className="flex cursor-pointer items-center gap-3 p-3.5">
-            <input
-              type="radio"
-              name="billing"
-              checked={!billingSame}
-              onChange={() => setBillingSame(false)}
-              className="size-4 accent-black"
-            />
-            <span className="text-[13px] text-black">Use a different billing address</span>
-          </label>
-        </div>
+      <div className="flex items-center gap-2 border border-black/15 bg-black/[0.02] px-4 py-3 text-[12px] text-black/75">
+        <Lock className="size-3.5 text-black/70" />
+        <span className="font-normal uppercase tracking-[0.04em]">Encrypted &amp; Secure Checkout</span>
       </div>
     </div>
   )
@@ -354,7 +342,6 @@ function CheckoutRightSummary({
 
   const totalDiscount = appliedPromo ? promoDiscount : automaticDiscount
   const total = Math.max(0, subtotal - totalDiscount + shippingCost)
-  const installment = Math.round(total / 4)
 
   const totalItemCount = cart.reduce((s, i) => s + i.quantity, 0)
 
@@ -552,11 +539,6 @@ function CheckoutRightSummary({
           </span>
         </div>
 
-        {page.show("installments") ? (
-          <p className="mt-2 text-[11px] leading-[1.5] tracking-[0.02em] text-black/65">
-            4 payments of <strong className="text-black">{formatPrice(installment)}</strong> with UPI or Netbanking ⓘ
-          </p>
-        ) : null}
       </div>
 
       {/* Authenticity & Perks */}
@@ -581,9 +563,9 @@ function CheckoutRightSummary({
 /* ─────────────────────────────────────────────
    Main Checkout & Payment Page
 ───────────────────────────────────────────── */
-export function CheckoutPage() {
+export function CheckoutPage({ onlinePaymentEnabled }: { onlinePaymentEnabled: boolean }) {
   const page = usePageContent("checkoutPage")
-  const { cart, totalItems, clearCart } = useCart()
+  const { cart, isLoaded, clearCart } = useCart()
 
   // Form State
   const [email, setEmail] = useState("")
@@ -605,19 +587,20 @@ export function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [orderComplete, setOrderComplete] = useState(false)
   const [orderId, setOrderId] = useState("")
-  const [billingSame, setBillingSame] = useState(true)
+  const [paymentChoice, setPaymentChoice] = useState<PaymentChoice>(onlinePaymentEnabled ? "online" : "cod")
+  const [paidMethod, setPaidMethod] = useState<"online" | "cod" | "free">("online")
   const [appliedPromo, setAppliedPromo] = useState<AppliedPromo | null>(null)
   const [isApplyingPromo, setIsApplyingPromo] = useState(false)
 
   useEffect(() => {
-    if (cart.length > 0) {
+    // Once per checkout visit, after the saved bag has loaded from storage.
+    if (isLoaded && cart.length > 0) {
       track("BEGIN_CHECKOUT", {
         payload: { items: cart.reduce((sum, item) => sum + item.quantity, 0) },
       })
     }
-    // Only once per checkout visit.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isLoaded])
 
   const selectedShipping =
     SHIPPING_OPTIONS.find((o) => o.id === shippingMethodId) ?? SHIPPING_OPTIONS[0]
@@ -748,6 +731,7 @@ export function CheckoutPage() {
         }
 
         setOrderId(orderRes.reference)
+        setPaidMethod("free")
         setIsSubmitting(false)
         setOrderComplete(true)
         clearCart()
@@ -759,6 +743,30 @@ export function CheckoutPage() {
         toast.error(err?.message || "Could not confirm order. Please try again.")
         return
       }
+    }
+
+    // Cash on Delivery: the order is saved as pending and confirmed by the shop.
+    if (paymentChoice === "cod" || !onlinePaymentEnabled) {
+      try {
+        const orderRes = await placeOrderAction({ ...basePayload, paymentMethod: "cod" })
+        if (!orderRes.success) {
+          setIsSubmitting(false)
+          toast.error(orderRes.message)
+          return
+        }
+        setOrderId(orderRes.reference)
+        setPaidMethod("cod")
+        setIsSubmitting(false)
+        setOrderComplete(true)
+        clearCart()
+        window.scrollTo({ top: 0 })
+        toast.success("Order placed successfully!")
+      } catch (err) {
+        console.error("COD order failed:", err)
+        setIsSubmitting(false)
+        toast.error("We couldn’t place your order right now. Please try again.")
+      }
+      return
     }
 
     // Online Payment via Razorpay Live Gateway
@@ -822,9 +830,11 @@ export function CheckoutPage() {
             }
 
             setOrderId(confirmRes.reference)
+            setPaidMethod("online")
             setIsSubmitting(false)
             setOrderComplete(true)
             clearCart()
+            window.scrollTo({ top: 0 })
             toast.success("Payment verified! Order confirmed.")
           } catch (err) {
             console.error("Payment confirmation failed:", err)
@@ -854,27 +864,7 @@ export function CheckoutPage() {
   // Order Confirmed Screen
   if (orderComplete) {
     return (
-      <main className="min-h-screen bg-white text-black">
-        {/* Minimal Checkout Header */}
-        <header className="border-b border-black/15 px-6 py-4 sm:px-10">
-          <div className="mx-auto flex max-w-6xl items-center justify-center">
-            <Link
-              href="/"
-              aria-label="Framing World home"
-              className="transition-opacity hover:opacity-70"
-            >
-              <Image
-                src="/brand/logo.webp"
-                alt="Framing World"
-                width={182}
-                height={105}
-                priority
-                className="block h-auto w-[4.75rem] sm:w-[5.5rem]"
-              />
-            </Link>
-          </div>
-        </header>
-
+      <main className="flex-1 bg-white text-black">
         <div className="mx-auto max-w-2xl px-4 py-16 text-center sm:px-6 sm:py-24">
           <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-black text-white">
             <CheckCircle2 className="size-10" />
@@ -905,14 +895,17 @@ export function CheckoutPage() {
             <p className="mt-3 text-[12px] uppercase tracking-[0.04em] text-black font-normal">
               Estimated Delivery: {selectedShipping.label} (3–5 business days)
             </p>
+            <p className="mt-1 text-[12px] uppercase tracking-[0.04em] text-black/60">
+              Payment: {paidMethod === "cod" ? "Cash on Delivery" : paidMethod === "free" ? "Covered by coupon" : "Paid online"}
+            </p>
           </div>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link
-              href="/account"
+              href="/track-order"
               className="inline-flex h-12 w-full items-center justify-center bg-black px-8 text-[14px] uppercase tracking-[0.04em] text-white transition-opacity hover:opacity-90 sm:w-auto"
             >
-              View Order in Account
+              Track Order
             </Link>
             <Link
               href="/collections"
@@ -932,68 +925,30 @@ export function CheckoutPage() {
     )
   }
 
+  if (!isLoaded) {
+    return (
+      <main className="flex flex-1 items-center justify-center bg-white py-24 text-black/50">
+        <LoaderCircle className="size-6 animate-spin" aria-label="Loading your bag" />
+      </main>
+    )
+  }
+
+  if (cart.length === 0) {
+    return (
+      <main className="flex flex-1 flex-col items-center justify-center bg-white px-4 py-24 text-center text-black">
+        <h1 className="type-title">Your bag is empty</h1>
+        <Link
+          href="/shop"
+          className="mt-8 inline-flex h-11 items-center bg-brand-cta px-8 text-[13px] font-medium uppercase tracking-[0.2em] text-white hover:bg-brand-terracotta"
+        >
+          Shop now
+        </Link>
+      </main>
+    )
+  }
+
   return (
-    <main className="min-h-screen bg-white text-black">
-      {/* ─── Framing World MINIMAL CHECKOUT HEADER ─── */}
-      <header className="border-b border-black/15 px-4 py-5 sm:px-8">
-        <div className="mx-auto grid max-w-6xl grid-cols-3 items-center">
-          {/* Left: Back to Shop */}
-          <div className="flex items-center justify-start">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.04em] text-black/55 transition-colors hover:text-black"
-            >
-              <ArrowLeft className="size-3.5" />
-              <span className="hidden sm:inline">Shop</span>
-            </Link>
-          </div>
-
-          {/* Center: Framing World Logo */}
-          <div className="flex items-center justify-center">
-            <Link
-              href="/"
-              aria-label="Framing World home"
-              className="transition-opacity hover:opacity-70"
-            >
-              <Image
-                src="/brand/logo.webp"
-                alt="Framing World"
-                width={182}
-                height={105}
-                priority
-                className="block h-auto w-[4.75rem] sm:w-[5.5rem]"
-              />
-            </Link>
-          </div>
-
-          {/* Right: Help & Bag Icon with Item Count */}
-          <div className="flex items-center justify-end gap-5 text-[12px] tracking-[0.04em] text-black/60">
-            {page.show("help") ? (
-              <div className="hidden items-center gap-2 sm:flex">
-                <span>{page.text("help", "text")}</span>
-                <a href={`mailto:${page.text("help", "email")}`} className="text-black underline underline-offset-2 hover:opacity-75">
-                  {page.text("help", "link")}
-                </a>
-              </div>
-            ) : null}
-
-            {/* Shopping Bag Icon with Count Badge */}
-            <Link
-              href="/cart"
-              className="relative flex items-center p-1 text-black transition-opacity hover:opacity-70"
-              aria-label="View Shopping Bag"
-            >
-              <ShoppingBag className="size-5" strokeWidth={1.5} />
-              {totalItems > 0 && (
-                <span className="absolute -right-1 -top-1 flex size-4 items-center justify-center rounded-full bg-black text-[11px] font-normal text-white">
-                  {totalItems}
-                </span>
-              )}
-            </Link>
-          </div>
-        </div>
-      </header>
-
+    <main className="flex-1 bg-white text-black">
       {/* ─── MAIN TWO-COLUMN CHECKOUT BODY ─── */}
       <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_390px] lg:items-start xl:gap-16">
@@ -1036,7 +991,7 @@ export function CheckoutPage() {
                       className="mt-0.5 size-4 accent-black"
                     />
                     <span className="text-[12px] leading-[1.5] text-black/60">
-                      {page.text("contact", "newsletter")}
+                      {page.text("contact", "newsletter")}{" "}
                       via email or other channels. See{" "}
                       <Link href="/privacy" className="underline hover:text-black">
                         Privacy Policy
@@ -1074,8 +1029,7 @@ export function CheckoutPage() {
                       />
                       <FloatingField
                         id="last-name"
-                        label="Last Name *"
-                        required
+                        label="Last Name"
                         value={lastName}
                         onChange={setLastName}
                       />
@@ -1103,11 +1057,6 @@ export function CheckoutPage() {
                         required
                         value={city}
                         onChange={setCity}
-                        rightBadge={
-                          <span className="flex items-center gap-1 text-[11px] text-black/40">
-                            APO / FPO <HelpCircle className="size-3" />
-                          </span>
-                        }
                       />
                       <FloatingSelect
                         id="state"
@@ -1119,7 +1068,7 @@ export function CheckoutPage() {
                       />
                       <FloatingField
                         id="zipcode"
-                        label="Zip Code *"
+                        label="PIN Code *"
                         required
                         value={pincode}
                         maxLength={6}
@@ -1180,8 +1129,9 @@ export function CheckoutPage() {
               /* Step 2: Payment View */
               <div className="space-y-8">
                 <PaymentSection
-                  billingSame={billingSame}
-                  setBillingSame={setBillingSame}
+                  method={paymentChoice}
+                  setMethod={setPaymentChoice}
+                  onlinePaymentEnabled={onlinePaymentEnabled}
                   isFreeOrder={finalTotal === 0}
                 />
 
@@ -1198,8 +1148,10 @@ export function CheckoutPage() {
                     </>
                   ) : finalTotal === 0 ? (
                     "Complete Order (Free)"
+                  ) : paymentChoice === "cod" || !onlinePaymentEnabled ? (
+                    `Place Order · ${formatPrice(finalTotal)}`
                   ) : (
-                    `Pay ${formatPrice(finalTotal)} with Razorpay`
+                    `Pay ${formatPrice(finalTotal)}`
                   )}
                 </button>
               </div>

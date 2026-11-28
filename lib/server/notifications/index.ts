@@ -12,6 +12,7 @@ import {
   renderContactAcknowledgementEmail,
   renderContactAdminEmail,
   renderDraftOrderEmail,
+  renderNewsletterWelcomeEmail,
   renderOrderEmail,
   renderOrderWhatsApp,
   type AuthEmailKind,
@@ -392,6 +393,32 @@ export async function notifyContactMessage(messageId: string) {
     )
   } catch (error) {
     console.error(`[notifications] contact message ${messageId} failed`, error)
+  }
+}
+
+export async function notifyNewsletterWelcome(input: {
+  email: string
+  code: string | null
+  percent: number
+  expiresAt: Date | null
+}) {
+  try {
+    const email = renderNewsletterWelcomeEmail(
+      { code: input.code, percent: input.percent, expiresAt: input.expiresAt },
+      templateContext(),
+    )
+    await recordAndSend(
+      {
+        channel: "EMAIL",
+        template: "NEWSLETTER_WELCOME",
+        recipient: input.email,
+        subject: email.subject,
+        payload: { code: input.code },
+      },
+      () => sendEmail({ to: input.email, subject: email.subject, html: email.html, text: email.text }),
+    )
+  } catch (error) {
+    console.error("[notifications] newsletter welcome email failed", error)
   }
 }
 

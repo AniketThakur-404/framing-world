@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/server/dal/auth"
 import { calculateGst } from "@/lib/server/dal/taxes"
 import { getPrisma } from "@/lib/server/db"
 import { clearUserCart, resolveCartLines } from "@/lib/server/services/cart"
+import { subscribeToNewsletter } from "@/lib/server/services/newsletter"
 import type { CheckoutInput } from "@/lib/validations/checkout"
 
 export class CheckoutError extends Error {
@@ -438,6 +439,15 @@ export async function placeStorefrontOrder(
 
     return order
   })
+
+  if (input.newsletter) {
+    try {
+      await subscribeToNewsletter(input.email, { source: "CHECKOUT", issueCode: false })
+    } catch (error) {
+      // Never fail a placed order over the mailing list.
+      console.error("[checkout] newsletter opt-in failed", error)
+    }
+  }
 
   if (input.analyticsSessionId) {
     await markRecordingConverted(input.analyticsSessionId, placed.id)

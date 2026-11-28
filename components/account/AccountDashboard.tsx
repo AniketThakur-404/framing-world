@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
@@ -36,6 +37,8 @@ export type CustomerOrder = {
     quantity: number
     unitPrice: string | number
     total: string | number
+    image: string | null
+    imageAlt: string
   }>
 }
 
@@ -246,9 +249,21 @@ export function AccountDashboard({ user, orders }: AccountDashboardProps) {
                           {order.items.map((item) => (
                             <div
                               key={item.id}
-                              className="flex items-center justify-between py-4 text-[13px]"
+                              className="flex items-center justify-between gap-4 py-4 text-[13px]"
                             >
-                              <div className="space-y-1">
+                              <div className="flex min-w-0 items-center gap-4">
+                              <div className="relative size-16 shrink-0 overflow-hidden bg-neutral-100 sm:size-20">
+                                {item.image ? (
+                                  <Image
+                                    src={item.image}
+                                    alt={item.imageAlt}
+                                    fill
+                                    sizes="80px"
+                                    className="object-cover"
+                                  />
+                                ) : null}
+                              </div>
+                              <div className="min-w-0 space-y-1">
                                 <p className="font-normal uppercase tracking-[0.02em] text-black sm:text-[14px]">
                                   {item.title}
                                 </p>
@@ -256,7 +271,8 @@ export function AccountDashboard({ user, orders }: AccountDashboardProps) {
                                   SKU: {item.sku} · Quantity: {item.quantity}
                                 </p>
                               </div>
-                              <span className="text-[14px] font-normal text-black">
+                              </div>
+                              <span className="shrink-0 text-[14px] font-normal text-black">
                                 {formatPrice(Number(item.total))}
                               </span>
                             </div>

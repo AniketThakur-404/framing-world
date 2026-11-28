@@ -2,6 +2,7 @@ import "server-only"
 
 import { requirePermission } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
+import { productImageUrl } from "@/lib/server/image-url"
 import { calculateGst, getTaxSettings, type TaxSettingData } from "@/lib/server/dal/taxes"
 
 type OrderStatus = "PENDING" | "CONFIRMED" | "FULFILLED" | "CANCELLED"
@@ -69,6 +70,9 @@ export type AdminOrderDetail = AdminOrderListItem & {
     unitPrice: number
     total: number
     variantId: string | null
+    productId: string | null
+    image: string | null
+    imageAlt: string
     taxRate: number
     tax: number
     hsnCode: string
@@ -181,6 +185,11 @@ export async function getOrderForAdmin(
                     taxRate: true,
                     hsnCode: true,
                     isTaxExempt: true,
+                    images: {
+                      select: { objectKey: true, altText: true },
+                      orderBy: { position: "asc" },
+                      take: 1,
+                    },
                   },
                 },
               },
@@ -230,6 +239,9 @@ export async function getOrderForAdmin(
       unitPrice: Number(item.unitPrice),
       total: itemTotal,
       variantId: item.variantId,
+      productId: product?.id ?? null,
+      image: productImageUrl(product?.images[0]?.objectKey),
+      imageAlt: product?.images[0]?.altText || product?.title || item.title,
       taxRate: itemRate,
       tax: itemCalc.totalGst,
       hsnCode,

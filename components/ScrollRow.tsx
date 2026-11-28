@@ -61,7 +61,7 @@ export function ScrollRow({
     <div className="relative">
       <div
         ref={ref}
-        data-lenis-prevent
+        data-lenis-prevent-horizontal
         role="region"
         aria-label={label}
         className={cn(

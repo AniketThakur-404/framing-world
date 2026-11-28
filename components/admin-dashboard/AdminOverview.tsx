@@ -347,15 +347,17 @@ export function AdminOverview({ initialData }: AdminOverviewProps) {
                     border: "1px solid #e5e5e5",
                     fontSize: 12,
                   }}
-                  formatter={(val: unknown) => {
+                  formatter={(val: unknown, name: unknown) => {
                     const num = typeof val === "number" ? val : Number(val) || 0
-                    if (selectedMetric === "Total sales") return [formatCurrency(num), ""]
-                    if (selectedMetric === "Conversion rate") return [`${num.toFixed(1)}%`, ""]
-                    return [num, ""]
+                    const label = String(name ?? "")
+                    if (selectedMetric === "Total sales") return [formatCurrency(num), label]
+                    if (selectedMetric === "Conversion rate") return [`${num.toFixed(1)}%`, label]
+                    return [num.toLocaleString("en-IN"), label]
                   }}
                 />
                 <Line
                   type="monotone"
+                  name={data?.previousPeriodLabel ?? "Previous period"}
                   dataKey="previous"
                   stroke="#8bd4f5"
                   strokeWidth={1.5}
@@ -364,6 +366,7 @@ export function AdminOverview({ initialData }: AdminOverviewProps) {
                 />
                 <Line
                   type="monotone"
+                  name={data?.currentPeriodLabel ?? "Current period"}
                   dataKey="current"
                   stroke="#08a7f5"
                   strokeWidth={1.8}

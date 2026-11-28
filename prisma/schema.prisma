@@ -408,6 +408,28 @@ model DraftOrderItem {
   @@map("draft_order_items")
 }
 
+enum NewsletterStatus {
+  SUBSCRIBED
+  UNSUBSCRIBED
+}
+
+/// Email list sign-ups from the footer, checkout tick-box, etc. Guests have no
+/// User row, so subscriptions are stored here for everyone.
+model NewsletterSubscriber {
+  id             String           @id @default(cuid())
+  email          String           @unique
+  status         NewsletterStatus @default(SUBSCRIBED)
+  source         String           @default("FOOTER")
+  /// Personal welcome code issued on first sign-up.
+  discountCode   String?
+  unsubscribedAt DateTime?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@index([status, createdAt])
+  @@map("newsletter_subscribers")
+}
+
 model Discount {
   id                 String              @id @default(cuid())
   title              String

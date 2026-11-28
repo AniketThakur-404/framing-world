@@ -220,8 +220,8 @@ export async function getAdminOverviewData(
   const [
     currentOrders,
     prevOrders,
-    currentSessionsCount,
-    prevSessionsCount,
+    currentSessions,
+    prevSessions,
     ordersToFulfil,
     paymentsToCapture,
     recentOrdersDb,
@@ -263,12 +263,14 @@ export async function getAdminOverviewData(
       },
     }),
     // Storefront visitor sessions current (first-party analytics beacon)
-    prisma.analyticsSession.count({
+    prisma.analyticsSession.findMany({
       where: { startedAt: { gte: currentStart, lte: currentEnd } },
+      select: { startedAt: true },
     }),
     // Storefront visitor sessions previous
-    prisma.analyticsSession.count({
+    prisma.analyticsSession.findMany({
       where: { startedAt: { gte: prevStart, lte: prevEnd } },
+      select: { startedAt: true },
     }),
     // Orders to fulfil (CONFIRMED)
     prisma.order.count({
@@ -337,6 +339,9 @@ export async function getAdminOverviewData(
     // Total product variants
     prisma.productVariant.count(),
   ])
+
+  const currentSessionsCount = currentSessions.length
+  const prevSessionsCount = prevSessions.length
 
   // Total Sales calculations (exclude cancelled)
   const currentSalesTotal = currentOrders
@@ -428,19 +433,25 @@ export async function getAdminOverviewData(
 
       const curOrders = slotCurrentOrders.length
       const prevOrdersCount = slotPrevOrders.length
+      const inSlot = (s: { startedAt: Date }) => {
+        const h = s.startedAt.getHours()
+        return h >= hour && h < hour + 2
+      }
+      const curSessions = currentSessions.filter(inSlot).length
+      const prevSessionsInSlot = prevSessions.filter(inSlot).length
 
       chartData.push({
         date: slotLabel,
-        current: curSessionsSlot(hour, currentSessionsCount),
-        previous: prevSessionsSlot(hour, prevSessionsCount),
+        current: curSessions,
+        previous: prevSessionsInSlot,
         currentSales: curSales,
         previousSales: prevSales,
         currentOrders: curOrders,
         previousOrders: prevOrdersCount,
-        currentSessions: curSessionsSlot(hour, currentSessionsCount),
-        previousSessions: prevSessionsSlot(hour, prevSessionsCount),
-        currentConversion: curOrders > 0 ? 100 : 0,
-        previousConversion: prevOrdersCount > 0 ? 100 : 0,
+        currentSessions: curSessions,
+        previousSessions: prevSessionsInSlot,
+        currentConversion: conversionRate(curOrders, curSessions),
+        previousConversion: conversionRate(prevOrdersCount, prevSessionsInSlot),
       })
     }
   } else {
@@ -477,19 +488,21 @@ export async function getAdminOverviewData(
 
       const curOrders = curDayOrders.length
       const prevOrdersCount = prevDayOrders.length
+      const curSessions = countBetween(currentSessions, curDayStart, curDayEnd)
+      const prevDaySessions = countBetween(prevSessions, prevDayStart, prevDayEnd)
 
       chartData.push({
         date: format(curDayStart, "MMM d"),
-        current: curDayOrders.length,
-        previous: prevDayOrders.length,
+        current: curSessions,
+        previous: prevDaySessions,
         currentSales: curSales,
         previousSales: prevSales,
         currentOrders: curOrders,
         previousOrders: prevOrdersCount,
-        currentSessions: 0,
-        previousSessions: 0,
-        currentConversion: curOrders > 0 ? 100 : 0,
-        previousConversion: prevOrdersCount > 0 ? 100 : 0,
+        currentSessions: curSessions,
+        previousSessions: prevDaySessions,
+        currentConversion: conversionRate(curOrders, curSessions),
+        previousConversion: conversionRate(prevOrdersCount, prevDaySessions),
       })
     }
   }
@@ -600,12 +613,17 @@ export async function getAdminOverviewData(
   }
 }
 
-function curSessionsSlot(hour: number, total: number) {
-  if (total === 0) return 0
-  return Math.round((total / 12) * (1 + 0.3 * Math.sin(hour)))
+function countBetween(sessions: Array<{ startedAt: Date }>, start: Date, end: Date) {
+  const from = start.getTime()
+  const to = end.getTime()
+  return sessions.filter((s) => {
+    const t = s.startedAt.getTime()
+    return t >= from && t <= to
+  }).length
 }
 
-function prevSessionsSlot(hour: number, total: number) {
-  if (total === 0) return 0
-  return Math.round((total / 12) * (1 + 0.2 * Math.cos(hour)))
+/** Orders per session as a percentage; mirrors the headline metric. */
+function conversionRate(orders: number, sessions: number) {
+  if (sessions === 0) return 0
+  return Math.round((orders / sessions) * 10000) / 100
 }

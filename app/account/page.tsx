@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 
 import { requireUser } from "@/lib/server/dal/auth"
 import { getPrisma } from "@/lib/server/db"
+import { productImageUrl } from "@/lib/server/image-url"
 import { AccountDashboard, type CustomerOrder } from "@/components/account/AccountDashboard"
 
 export const metadata: Metadata = {
@@ -22,7 +23,24 @@ export default async function AccountPage() {
       ],
     },
     include: {
-      items: true,
+      items: {
+        include: {
+          variant: {
+            select: {
+              product: {
+                select: {
+                  title: true,
+                  images: {
+                    select: { objectKey: true, altText: true },
+                    orderBy: { position: "asc" },
+                    take: 1,
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
       createdAt: "desc",
@@ -42,14 +60,19 @@ export default async function AccountPage() {
     shippingMethod: o.shippingMethod,
     shippingAddress: (o.shippingAddress as CustomerOrder["shippingAddress"]) ?? null,
     createdAt: o.createdAt.toISOString(),
-    items: o.items.map((it) => ({
-      id: it.id,
-      title: it.title,
-      sku: it.sku,
-      quantity: it.quantity,
-      unitPrice: Number(it.unitPrice),
-      total: Number(it.total),
-    })),
+    items: o.items.map((it) => {
+      const image = it.variant?.product.images[0]
+      return {
+        id: it.id,
+        title: it.title,
+        sku: it.sku,
+        quantity: it.quantity,
+        unitPrice: Number(it.unitPrice),
+        total: Number(it.total),
+        image: productImageUrl(image?.objectKey),
+        imageAlt: image?.altText || it.variant?.product.title || it.title,
+      }
+    }),
   }))
 
   return (

@@ -359,6 +359,44 @@ ${itemsTable(snapshot)}`,
   }
 }
 
+export function renderNewsletterWelcomeEmail(
+  input: { code: string | null; percent: number; expiresAt: Date | null },
+  ctx: TemplateContext,
+): RenderedEmail {
+  const shopUrl = `${ctx.siteUrl}/collections/shop`
+  const expiry = input.expiresAt
+    ? input.expiresAt.toLocaleDateString("en-IN", { day: "numeric", month: "long", year: "numeric" })
+    : null
+
+  const codeBlock = input.code
+    ? `<p style="margin:0 0 8px;">Here is your ${input.percent}% welcome code. Enter it at checkout:</p>
+<p style="margin:18px 0;text-align:center;"><span style="display:inline-block;border:1px dashed #111;padding:14px 26px;font-size:20px;letter-spacing:0.18em;font-weight:600;">${escapeHtml(input.code)}</span></p>
+<p style="margin:0;color:#666;font-size:12px;">Valid for one order${expiry ? ` until ${escapeHtml(expiry)}` : ""}.</p>`
+    : `<p style="margin:0;">You'll be the first to hear about new collections, framing tips and member offers.</p>`
+
+  const html = layout(
+    ctx,
+    `Welcome to ${ctx.storeName}`,
+    `<h1 style="margin:0 0 12px;font-size:20px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">You're on the list</h1>
+<p style="margin:0 0 18px;">Thanks for subscribing to ${escapeHtml(ctx.storeName)}.</p>
+${codeBlock}
+${button(shopUrl, "Shop the collection")}`,
+    input.code ? `Your ${input.percent}% welcome code is inside.` : "Thanks for subscribing.",
+  )
+
+  const text = input.code
+    ? `Thanks for subscribing to ${ctx.storeName}.\n\nYour ${input.percent}% welcome code: ${input.code}\nValid for one order${expiry ? ` until ${expiry}` : ""}.\n\nShop: ${shopUrl}`
+    : `Thanks for subscribing to ${ctx.storeName}.\n\nShop: ${shopUrl}`
+
+  return {
+    subject: input.code
+      ? `Your ${input.percent}% welcome code · ${ctx.storeName}`
+      : `Welcome to ${ctx.storeName}`,
+    html,
+    text,
+  }
+}
+
 export function renderContactAdminEmail(
   message: { name: string; email: string; subject: string; message: string; createdAt: Date },
   ctx: TemplateContext,
